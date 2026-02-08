@@ -1,89 +1,90 @@
-You're right to call that out! To truly gain mastery, we need to be precise. I will provide the full, deep-dive breakdown of **70 distinct problems**, categorized by their architectural patterns, difficulty, and interview frequency.
+We've categorized our 70 problems into the **4 Pillars of HLD**. This structure is your "cheat sheet" for interviews—when an interviewer asks a question, your first step is to identify which pillar it belongs to so you know which architectural "tools" to pull out of your bag. 🧰
 
-I'll help you navigate this massive list by asking you which "pattern" we should tackle first once you've had a look.
+Below is the complete, master table of all 70 problems, deeply categorized by their sub-category, primary challenge, and their corresponding HLD pillar.
 
-### 🗺️ The Complete HLD Mastery Roadmap (70 Problems)
+### 🏛️ The 70-Problem HLD Master Map
 
-| Sub-Category | # | Problem / System | Diff | Freq |
-| --- | --- | --- | --- | --- |
-| **1. Traffic & Security** 🧱 | 1 | Load Balancer Design | Easy | ⭐ |
-|  | 2 | API Gateway Service | Easy | ⭐ |
-|  | 3 | Rate Limiter (Distributed) | Med | ⭐ |
-|  | 4 | Web Application Firewall (WAF) | Med |  |
-|  | 5 | DDOS Protection System | Hard |  |
-|  | 6 | Secrets Manager (Vault-like) | Med |  |
-| **2. Global Infrastructure** 🔗 | 7 | URL Shortener (TinyURL) | Easy | ⭐ |
-|  | 8 | Pastebin (Text Storage) | Easy | ⭐ |
-|  | 9 | Distributed ID Generator (Snowflake) | Med | ⭐ |
-|  | 10 | Consistent Hashing Implementation | Med | ⭐ |
-|  | 11 | Content Delivery Network (CDN) | Med |  |
-|  | 12 | Multi-region Traffic Router | Hard |  |
-| **3. Content Discovery** 📱 | 13 | News Feed (Push/Pull Models) | Hard | ⭐ |
-|  | 14 | Instagram (Media Feed) | Med | ⭐ |
-|  | 15 | Pinterest (Grid/Image Feed) | Med |  |
-|  | 16 | Twitter (High-Volume Fan-out) | Hard | ⭐ |
-|  | 17 | Reddit (Ranking & Upvotes) | Med |  |
-|  | 18 | HackerNews (Time-decay Ranking) | Med |  |
-|  | 19 | Recommendation Engine (Friend Suggest) | Med |  |
-| **4. Communication** 💬 | 20 | WhatsApp/Messenger (1-on-1) | Med | ⭐ |
-|  | 21 | Group Chat System | Hard | ⭐ |
-|  | 22 | Presence Platform (Online Status) | Med |  |
-|  | 23 | Slack (Enterprise Messaging) | Hard |  |
-|  | 24 | Notification Service | Med | ⭐ |
-|  | 25 | Zoom / Video Conferencing | Hard |  |
-|  | 26 | Email Service (Gmail-like) | Hard |  |
-| **5. Media & Streaming** 🎥 | 27 | YouTube (Upload & Playback) | Hard | ⭐ |
-|  | 28 | Netflix (Global Video Distribution) | Hard |  |
-|  | 29 | TikTok (Short-form Feed) | Hard |  |
-|  | 30 | Spotify (Music/Audio Streaming) | Med |  |
-|  | 31 | Live Streaming Service (Twitch) | Hard |  |
-|  | 32 | Video Transcoding Pipeline | Med |  |
-| **6. Geospatial Systems** 🚗 | 33 | Uber/Lyft (Matching Service) | Hard | ⭐ |
-|  | 34 | Google Maps (Pathfinding) | Hard | ⭐ |
-|  | 35 | Yelp/Nearby (Proximity Service) | Med | ⭐ |
-|  | 36 | Food Delivery (Order Tracking) | Med |  |
-|  | 37 | Public Transit Tracker | Med |  |
-|  | 38 | Hotel Booking (Expedia) | Med |  |
-|  | 39 | AirBnB (Search & Reservation) | Hard |  |
-| **7. Search & Data Retrieval** 🔍 | 40 | Web Crawler | Med | ⭐ |
-|  | 41 | Autocomplete/Typeahead | Med | ⭐ |
-|  | 42 | Google Search (Ranking/Indexing) | Hard |  |
-|  | 43 | Elasticsearch (Log Search) | Hard |  |
-|  | 44 | E-commerce Search & Filters | Med |  |
-| **8. Fintech & Correctness** 💸 | 45 | Payment Gateway (Stripe-like) | Hard | ⭐ |
-|  | 46 | Digital Wallet (Ledger System) | Hard | ⭐ |
-|  | 47 | Crypto Exchange (Order Book) | Hard |  |
-|  | 48 | Fraud Detection Service | Hard |  |
-|  | 49 | Stock Brokerage (Robinhood) | Hard |  |
-|  | 50 | Ad-Click Aggregator | Hard | ⭐ |
-| **9. High Concurrency** 🎟️ | 51 | Ticketmaster (Booking) | Hard | ⭐ |
-|  | 52 | Flash Sale System (Amazon) | Hard | ⭐ |
-|  | 53 | Flight Reservation System | Hard |  |
-|  | 54 | Online Quiz (Kahoot-like) | Med |  |
-|  | 55 | Voting System (Election-scale) | Hard |  |
-| **10. Storage & Infra** ⚙️ | 56 | Distributed Cache (Redis-like) | Med |  |
-|  | 57 | Distributed Message Queue (Kafka) | Hard | ⭐ |
-|  | 58 | S3-like Object Storage | Hard |  |
-|  | 59 | Distributed Key-Value Store | Hard |  |
-|  | 60 | Distributed File System (HDFS) | Hard |  |
-|  | 61 | Logging Pipeline (ELK) | Med |  |
-|  | 62 | Metrics & Monitoring (Prometheus) | Hard |  |
-|  | 63 | Distributed Task Scheduler | Med | ⭐ |
-| **11. Big Data/Analysis** 📈 | 64 | Top K Elements (Heavy Hitters) | Med | ⭐ |
-|  | 65 | A/B Testing Platform | Med |  |
-|  | 66 | Data Warehouse (BigQuery-like) | Hard |  |
-| **12. Productivity Tools** ✍️ | 67 | Google Docs (Real-time Editing) | Hard | ⭐ |
-|  | 68 | Collaborative Whiteboard (Miro) | Hard |  |
-|  | 69 | Online Code Judge (LeetCode) | Med |  |
-|  | 70 | Survey Tool (Google Forms) | Easy |  |
+| Sub-Category | Pillar | Primary Challenge | Problem | Diff | Freq |
+| --- | --- | --- | --- | --- | --- |
+| **1. Traffic Control** 🧱 | **Storage/HA** | Load Balancing | 1. Load Balancer Design | Easy | ⭐ |
+|  | **Storage/HA** | Request Routing | 2. API Gateway Service | Easy | ⭐ |
+|  | **Write-Heavy** | Request Throttling | 3. Rate Limiter (Distributed) | Med | ⭐ |
+|  | **Storage/HA** | Security Filtering | 4. Web App Firewall (WAF) | Med |  |
+|  | **Storage/HA** | Traffic Scrubbing | 5. DDOS Protection System | Hard |  |
+|  | **Storage/HA** | Secret Management | 6. Secrets Manager (Vault) | Med |  |
+| **2. Global Infra** 🔗 | **Storage/HA** | Key Mapping | 7. URL Shortener (TinyURL) | Easy | ⭐ |
+|  | **Storage/HA** | Blob Storage | 8. Pastebin (Text Storage) | Easy | ⭐ |
+|  | **Storage/HA** | Unique Sequence | 9. Distributed ID (Snowflake) | Med | ⭐ |
+|  | **Storage/HA** | Data Partitioning | 10. Consistent Hashing | Med | ⭐ |
+|  | **Storage/HA** | Edge Caching | 11. Content Delivery Network | Med |  |
+|  | **Storage/HA** | Geo-Routing | 12. Multi-region Router | Hard |  |
+| **3. Content Discovery** 📱 | **Read-Heavy** | Feed Generation | 13. News Feed (Push/Pull) | Hard | ⭐ |
+|  | **Read-Heavy** | Media Delivery | 14. Instagram (Media Feed) | Med | ⭐ |
+|  | **Read-Heavy** | Grid Aggregation | 15. Pinterest (Image Feed) | Med |  |
+|  | **Write-Heavy** | Massive Fan-out | 16. Twitter (Write Path) | Hard | ⭐ |
+|  | **Read-Heavy** | Vote Aggregation | 17. Reddit (Ranking) | Med |  |
+|  | **Read-Heavy** | Time-Decay Math | 18. HackerNews (Ranking) | Med |  |
+|  | **Read-Heavy** | Graph Traversal | 19. Friend Suggestions | Med |  |
+| **4. Communication** 💬 | **Write-Heavy** | Socket Mgmt | 20. WhatsApp (1-on-1) | Med | ⭐ |
+|  | **Write-Heavy** | Msg Ordering | 21. Group Chat System | Hard | ⭐ |
+|  | **Read-Heavy** | Heartbeat Mgmt | 22. Presence Platform | Med |  |
+|  | **Write-Heavy** | Pub/Sub | 23. Slack (Enterprise) | Hard |  |
+|  | **Write-Heavy** | Fan-out | 24. Notification Service | Med | ⭐ |
+|  | **Read-Heavy** | Low Latency Video | 25. Zoom Video Conf. | Hard |  |
+|  | **Storage/HA** | Mail Retrieval | 26. Email Service (Gmail) | Hard |  |
+| **5. Media/Streaming** 🎥 | **Storage/HA** | Large File Upload | 27. YouTube (Storage) | Hard | ⭐ |
+|  | **Read-Heavy** | Global Replication | 28. Netflix Distribution | Hard |  |
+|  | **Read-Heavy** | Vertical Feed | 29. TikTok (Video Feed) | Hard |  |
+|  | **Read-Heavy** | Metadata Sync | 30. Spotify (Streaming) | Med |  |
+|  | **Read-Heavy** | Live Buffer Mgmt | 31. Twitch (Live Stream) | Hard |  |
+|  | **Write-Heavy** | Compute Pipeline | 32. Video Transcoding | Med |  |
+| **6. Geospatial** 🚗 | **Read-Heavy** | Proximity Search | 33. Uber/Lyft (Matching) | Hard | ⭐ |
+|  | **Read-Heavy** | Graph Routing | 34. Google Maps (Paths) | Hard | ⭐ |
+|  | **Read-Heavy** | Spatial Indexing | 35. Yelp/Nearby | Med | ⭐ |
+|  | **Write-Heavy** | Real-time Tracking | 36. Food Delivery Tracker | Med |  |
+|  | **Read-Heavy** | Static Map Tiles | 37. Transit Tracker | Med |  |
+|  | **ACID/Trans** | Inventory Locking | 38. Hotel Booking | Med |  |
+|  | **ACID/Trans** | Double-Booking | 39. AirBnB Reservation | Hard |  |
+| **7. Search/Data** 🔍 | **Write-Heavy** | BFS at Scale | 40. Web Crawler | Med | ⭐ |
+|  | **Read-Heavy** | Trie Traversal | 41. Autocomplete | Med | ⭐ |
+|  | **Read-Heavy** | PageRank/Indexing | 42. Google Search | Hard |  |
+|  | **Read-Heavy** | Inverted Index | 43. Elasticsearch (Logs) | Hard |  |
+|  | **Read-Heavy** | Dynamic Filters | 44. E-commerce Search | Med |  |
+| **8. Fintech** 💸 | **ACID/Trans** | External Sync | 45. Payment Gateway | Hard | ⭐ |
+|  | **ACID/Trans** | Double Entry | 46. Digital Wallet | Hard | ⭐ |
+|  | **ACID/Trans** | High-Freq Trading | 47. Crypto Exchange | Hard |  |
+|  | **Write-Heavy** | Pattern Match | 48. Fraud Detection | Hard |  |
+|  | **ACID/Trans** | Order Matching | 49. Stock Brokerage | Hard |  |
+|  | **Write-Heavy** | Stream Aggreg. | 50. Ad-Click Aggregator | Hard | ⭐ |
+| **9. Concurrency** 🎟️ | **ACID/Trans** | High Contention | 51. Ticketmaster | Hard | ⭐ |
+|  | **ACID/Trans** | Inventory Rush | 52. Flash Sale System | Hard | ⭐ |
+|  | **ACID/Trans** | Seat Reservation | 53. Flight Reservation | Hard |  |
+|  | **Read-Heavy** | Real-time Score | 54. Online Quiz (Kahoot) | Med |  |
+|  | **ACID/Trans** | Vote Integrity | 55. Election System | Hard |  |
+| **10. Infra/Storage** ⚙️ | **Read-Heavy** | LRU Eviction | 56. Distributed Cache | Med |  |
+|  | **Write-Heavy** | Append-only Log | 57. Message Queue (Kafka) | Hard | ⭐ |
+|  | **Storage/HA** | Erasure Coding | 58. S3 Object Storage | Hard |  |
+|  | **Storage/HA** | Consensus (Paxos) | 59. Key-Value Store | Hard |  |
+|  | **Storage/HA** | File Chunking | 60. HDFS (Distributed FS) | Hard |  |
+|  | **Write-Heavy** | Time-series Ingest | 61. Logging Pipeline | Med |  |
+|  | **Write-Heavy** | Data Collection | 62. Metrics Monitoring | Hard |  |
+|  | **Write-Heavy** | Delayed Execution | 63. Task Scheduler | Med | ⭐ |
+| **11. Big Data** 📈 | **Write-Heavy** | Counting at Scale | 64. Top K (Heavy Hitters) | Med | ⭐ |
+|  | **Read-Heavy** | Bucket Traffic | 65. A/B Testing Platform | Med |  |
+|  | **Read-Heavy** | OLAP Queries | 66. Data Warehouse | Hard |  |
+| **12. Productivity** ✍️ | **ACID/Trans** | Conflict Resolut. | 67. Google Docs (OT/CRDT) | Hard | ⭐ |
+|  | **Write-Heavy** | Event Replay | 68. Whiteboard (Miro) | Hard |  |
+|  | **Write-Heavy** | Sandboxed Exec | 69. Code Judge (LeetCode) | Med |  |
+|  | **Storage/HA** | Form Schema Mgmt | 70. Google Forms | Easy |  |
 
 ---
 
-Now that you have the full "map," how would you like to start? We can dive into a specific problem, or I can explain the **4 Core Patterns** that will help you solve almost 80% of this list.
+### 🚀 Let's Pick Your Starting Point
 
-1. **The Write-Heavy Pattern:** (Systems like Kafka, Logging, Metrics)
-2. **The Read-Heavy/Fan-out Pattern:** (Systems like Twitter, Instagram, News Feeds)
-3. **The ACID/Transaction Pattern:** (Systems like Payments, Ticket Booking, Wallets)
-4. **The High-Availability/Storage Pattern:** (Systems like TinyURL, S3, Google Drive)
+To master HLD, we shouldn't just read the answers. We need to build them together. Based on your goals for top product companies, I recommend starting with one of these three high-impact "anchor" problems. They each teach a fundamental skill that applies to dozens of others.
 
-**Which of these patterns should we investigate first?**
+1. **TinyURL (Pillar 4):** Learn how to scale a database from 1 to 1 billion entries. (Foundational) 🔗
+2. **Twitter/News Feed (Pillar 2):** Learn how to handle "Celebrity users" and massive data distribution. (The "Fan-out" King) 📣
+3. **Rate Limiter (Pillar 1/10):** Learn how to protect your system from crashing when too many people use it at once. (Logic & Concurrency) 🛡️
+
+**Which of these three should we tackle first?**
