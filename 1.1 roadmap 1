@@ -1,0 +1,600 @@
+Excellent. Below is a **fully consolidated, structured, and polished High-Level Design (HLD) mastery blueprint**, including:
+
+* Complete step-by-step roadmap
+* Interview execution framework
+* Foundational concepts
+* All patterns and sub-patterns mentioned
+* All questions included (none skipped)
+* Categorized master table (Pattern, Sub-pattern, System Type, Core Focus)
+* Execution plan
+* Advanced topics
+* Tracking structure (aligned with your pattern-based DP mindset)
+
+This is designed as a **serious FAANG-level preparation document**.
+
+---
+
+# 🔷 PART 1 — What Top Companies Actually Evaluate
+
+Companies like **Google**, **Amazon**, and **Meta** evaluate:
+
+### ✅ They Test
+
+1. Requirement clarification under ambiguity
+2. System decomposition
+3. Scalability reasoning
+4. Trade-off articulation
+5. Data modeling decisions
+6. Bottleneck identification
+7. Communication clarity
+
+### ❌ They Do NOT Test
+
+* Perfect architecture diagrams
+* Memorized designs
+* Tool name-dropping
+
+They test **engineering judgment under uncertainty**.
+
+---
+
+# 🔷 PART 2 — Foundational Knowledge (Weeks 1–3)
+
+You must master the “bricks” before designing the building.
+
+---
+
+## 1️⃣ Networking & Protocols
+
+* HTTP / HTTPS
+* TCP vs UDP
+* WebSockets
+* Long polling
+* gRPC
+* HTTP/2
+* DNS
+* CDNs
+* Reverse proxy
+
+---
+
+## 2️⃣ Scaling Concepts
+
+* Vertical vs Horizontal scaling
+* Stateless vs Stateful services
+* Load balancing
+
+  * Layer 4 vs Layer 7
+  * Round robin
+  * Least connections
+* Auto-scaling groups
+
+---
+
+## 3️⃣ Databases
+
+### SQL (ACID)
+
+* MySQL
+* PostgreSQL
+* Master-slave replication
+* Sharding
+* Indexing strategies
+
+### NoSQL (BASE)
+
+* Key-value (Redis)
+* Document (MongoDB)
+* Wide-column (Cassandra/HBase)
+* Graph (Neo4j)
+
+### Theory
+
+* CAP Theorem
+* PACELC
+* Strong vs Eventual consistency
+* Read replicas
+* Partition tolerance
+
+---
+
+## 4️⃣ Caching
+
+* Cache-aside
+* Write-through
+* Write-back
+* Write-around
+* LRU / LFU / TTL
+* Multi-layer caching (CDN + App + DB)
+
+---
+
+## 5️⃣ Messaging & Async Processing
+
+* Queue vs Stream
+* Pub/Sub
+* Kafka vs RabbitMQ
+* At-least-once vs Exactly-once
+* Idempotency
+* SAGA pattern
+
+---
+
+## 6️⃣ Storage
+
+* Blob storage (S3-like)
+* Block storage
+* File storage
+* Object storage
+* Chunking
+* Deduplication
+
+---
+
+## 7️⃣ Reliability & Resilience
+
+* Circuit breaker
+* Retry logic
+* Health checks
+* Distributed locking
+* Leader election
+* Eliminating SPOF
+* SLAs / SLOs
+
+---
+
+# 🔷 PART 3 — The 45-Minute Interview Framework
+
+Use this structure every time.
+
+---
+
+## Step 1 — Requirements (5–10 mins)
+
+### Functional
+
+What must the system do?
+
+### Non-functional
+
+* Latency (e.g., <500ms)
+* Availability (99.99%?)
+* Consistency (Strong vs Eventual)
+* Throughput (QPS)
+* Durability
+
+---
+
+## Step 2 — Back-of-the-envelope Estimation (5 mins)
+
+Estimate:
+
+* DAU
+* Read/write ratio
+* QPS
+* Storage/year
+* Bandwidth
+
+---
+
+## Step 3 — API Design (5 mins)
+
+Example:
+
+```
+POST /tweet
+GET /feed
+POST /payment
+```
+
+---
+
+## Step 4 — High-Level Architecture (10 mins)
+
+Client → DNS → Load Balancer → App Servers → DB / Cache / MQ
+
+---
+
+## Step 5 — Deep Dive (15 mins)
+
+* Sharding strategy
+* Caching strategy
+* Data model
+* Queue usage
+* Failure handling
+
+---
+
+## Step 6 — Bottlenecks & Trade-offs (5 mins)
+
+* Hot keys?
+* 10x traffic?
+* Regional failure?
+* DB crash?
+* Consistency compromise?
+
+---
+
+# 🔷 PART 4 — Complete Pattern-Based Categorization
+
+Below is the full consolidated table including every question mentioned.
+
+---
+
+# 📊 MASTER HLD PRACTICE TABLE
+
+| Pattern | Sub-Pattern | System Type | Core Focus | Practice Questions |
+| ------- | ----------- | ----------- | ---------- | ------------------ |
+
+---
+
+## 🟢 Pattern A — CRUD / Storage / Key-Value Systems
+
+| Pattern        | Sub-Pattern        | System Type              | Core Focus             | Questions                                                                      |
+| -------------- | ------------------ | ------------------------ | ---------------------- | ------------------------------------------------------------------------------ |
+| CRUD / Storage | Key-Value Store    | Read-heavy / Write-heavy | Hashing, ID generation | URL Shortener (TinyURL/Bitly), Pastebin, Key-Value Store (Redis/DynamoDB-like) |
+| CRUD / Storage | Content Management | Storage-heavy            | Chunking, Sync, Dedup  | Google Drive, Dropbox, Image Hosting (Imgur/Flickr)                            |
+| CRUD           | Multi-tenant CRUD  | Balanced                 | Sharding by user_id    | Online Bookstore, E-commerce Store (Amazon)                                    |
+
+---
+
+## 🟢 Pattern B — Social Networks (Feeds & Graphs)
+
+| Pattern       | Sub-Pattern         | System Type                 | Core Focus             | Questions                              |
+| ------------- | ------------------- | --------------------------- | ---------------------- | -------------------------------------- |
+| Feeds         | Timeline Generation | Read-heavy                  | Fan-out (Push vs Pull) | Twitter, Instagram, Facebook News Feed |
+| Feeds         | Ranking             | Read-heavy                  | Ranking algorithms     | LinkedIn Feed                          |
+| Graph Systems | Social Connections  | Write-heavy graph traversal | Graph DB               | LinkedIn Connections, Facebook Friends |
+
+---
+
+## 🟢 Pattern C — Real-Time Communication
+
+| Pattern      | Sub-Pattern       | System Type           | Core Focus           | Questions                                    |
+| ------------ | ----------------- | --------------------- | -------------------- | -------------------------------------------- |
+| Messaging    | 1:1 & Group Chat  | Low-latency           | WebSockets, ordering | WhatsApp, Facebook Messenger, Slack, Discord |
+| Live Updates | Collaborative     | Consistency-sensitive | OT, CRDT             | Google Docs                                  |
+| Live Updates | Streaming updates | Low-latency           | Pub/Sub              | Live Scoreboard                              |
+| Conferencing | Real-time media   | UDP-heavy             | WebRTC, SFU/MCU      | Zoom                                         |
+
+---
+
+## 🟢 Pattern D — Streaming & Media
+
+| Pattern            | Sub-Pattern     | System Type   | Core Focus           | Questions                |
+| ------------------ | --------------- | ------------- | -------------------- | ------------------------ |
+| Video Streaming    | Media delivery  | Read-heavy    | CDN, transcoding     | YouTube, Netflix         |
+| Audio Streaming    | DRM & streaming | Read-heavy    | Adaptive bitrate     | Spotify                  |
+| Large File Storage | Blob systems    | Storage-heavy | CDN + object storage | Video Streaming Platform |
+
+---
+
+## 🟢 Pattern E — Geospatial Systems
+
+| Pattern          | Sub-Pattern        | System Type | Core Focus            | Questions         |
+| ---------------- | ------------------ | ----------- | --------------------- | ----------------- |
+| Ride Matching    | Real-time matching | Write-heavy | Geohashing, Quadtrees | Uber, Lyft        |
+| Proximity Search | Geo indexing       | Read-heavy  | Spatial queries       | Yelp, Google Maps |
+| Logistics        | Real-time tracking | Write-heavy | Location updates      | DoorDash, Zomato  |
+
+---
+
+## 🟢 Pattern F — High Throughput & Logging
+
+| Pattern     | Sub-Pattern     | System Type    | Core Focus      | Questions                        |
+| ----------- | --------------- | -------------- | --------------- | -------------------------------- |
+| Web Crawler | URL frontier    | Write-heavy    | BFS, politeness | Google Search crawler            |
+| Analytics   | Batch + Stream  | High ingestion | ETL, MapReduce  | Google Analytics                 |
+| Logging     | Event ingestion | Write-heavy    | Kafka pipeline  | Distributed Logging (Splunk/ELK) |
+| Metrics     | Time-series     | Write-heavy    | Aggregation     | Prometheus, Datadog              |
+
+---
+
+## 🟢 Pattern G — Critical Consistency & Locking
+
+| Pattern       | Sub-Pattern  | System Type        | Core Focus          | Questions                       |
+| ------------- | ------------ | ------------------ | ------------------- | ------------------------------- |
+| Payment       | Financial    | Strong consistency | Double-entry ledger | Stripe, PayPal, Payment Gateway |
+| Ticketing     | Reservation  | High concurrency   | Seat locking        | Ticketmaster, BookMyShow        |
+| Job Scheduler | Coordination | Consistency        | Leader election     | Distributed Job Scheduler       |
+| Booking       | Reservation  | Strong ACID        | Distributed locking | Hotel / Airline Booking         |
+
+---
+
+## 🟢 Pattern H — Infrastructure Utilities
+
+| Pattern           | Sub-Pattern     | System Type     | Core Focus         | Questions         |
+| ----------------- | --------------- | --------------- | ------------------ | ----------------- |
+| Rate Limiting     | Throttling      | Write-heavy     | Token bucket       | API Rate Limiter  |
+| Distributed Cache | Caching         | Read-heavy      | Consistent hashing | Memcached, Redis  |
+| CDN               | Edge caching    | Read-heavy      | Geo routing        | CDN               |
+| ID Generator      | Unique IDs      | Write-heavy     | Snowflake          | Unique ID Service |
+| Kafka-like System | Streaming infra | High throughput | Log partitioning   | Kafka-like system |
+
+---
+
+## 🟢 Pattern I — Recommendation Systems
+
+| Pattern         | Sub-Pattern      | System Type | Core Focus      | Questions                     |
+| --------------- | ---------------- | ----------- | --------------- | ----------------------------- |
+| Recommendations | Offline + Online | Read-heavy  | Feature store   | Netflix Recommendation        |
+| Recommendations | Content ranking  | Read-heavy  | ML serving      | YouTube Recommendation        |
+| Recommendations | Product ranking  | Read-heavy  | Hybrid pipeline | Amazon Product Recommendation |
+
+---
+
+# 🔷 PART 5 — 8-Week Execution Plan
+
+| Week | Focus                        |
+| ---- | ---------------------------- |
+| 1–2  | Foundations                  |
+| 3    | CRUD + URL Shortener + Cache |
+| 4    | Feed systems                 |
+| 5    | Realtime + Search            |
+| 6    | Logging + Rate limiter       |
+| 7    | Payments + Booking           |
+| 8    | 5 full mock interviews       |
+
+---
+
+# 🔷 PART 6 — Advanced (Staff-Level)
+
+* Multi-region architecture
+* Active-active vs Active-passive
+* Cross-region replication
+* Data migration
+* Schema evolution
+* Consistent hashing internals
+* Raft consensus
+* SAGA pattern
+
+---
+
+# 🔷 PART 7 — Tracking Template (Your Style)
+
+Since you love structured Excel tracking:
+
+| Question | Pattern | Sub-pattern | Read/Write Type | Scale | Attempt 1 | Bottlenecks Missed | Trade-offs Missed | Final Confidence |
+| -------- | ------- | ----------- | --------------- | ----- | --------- | ------------------ | ----------------- | ---------------- |
+
+Color code:
+
+* Green = Strong
+* Yellow = Moderate
+* Red = Weak
+
+---
+
+# 🔷 Final Advice (Strategic)
+
+You already master:
+
+* Pattern recognition (from DP)
+* Structured learning
+* Tracking & iteration
+
+Treat HLD exactly the same way:
+
+1. Solve 3 per pattern
+2. Identify common architectural motifs
+3. Refine trade-offs
+4. Revisit after 2 weeks
+
+---
+
+If you'd like next, I can:
+
+* Build a **ready-to-use HLD Excel tracking template structure**
+* Run a **real 45-minute mock interview simulation**
+* Deep dive one pattern (e.g., Feed system with full architecture)
+* Create a **priority-ordered top 30 question list for FAANG**
+
+Tell me your next move.
+
+
+Excellent. Since you prefer **structured, pattern-wise tracking (like your DP Excel system)**, below is a **ready-to-use HLD Excel template structure** + a **priority-ordered Top 30 FAANG HLD question list**, categorized by pattern and importance.
+
+This is optimized for:
+
+* Structured learning
+* Measurable improvement
+* Mock interview readiness
+* Pattern recognition
+
+---
+
+# 📊 PART 1 — READY-TO-USE HLD EXCEL TRACKING TEMPLATE
+
+You should create **4 sheets**:
+
+---
+
+# 🟢 SHEET 1 — MASTER DASHBOARD
+
+### Columns:
+
+| Field              | Description                   |
+| ------------------ | ----------------------------- |
+| Total Questions    | =COUNT(All Questions)         |
+| Completed          | COUNTIF(Status, "Done")       |
+| Weak Areas         | COUNTIF(Confidence, "Red")    |
+| Medium             | COUNTIF(Confidence, "Yellow") |
+| Strong             | COUNTIF(Confidence, "Green")  |
+| Next Focus Pattern | Manual                        |
+
+Add:
+
+* Conditional formatting (Green / Yellow / Red)
+* Completion % bar
+
+---
+
+# 🟢 SHEET 2 — QUESTION TRACKER (Main Sheet)
+
+### Columns (Copy Exactly)
+
+| Column             | Purpose                                                     |
+| ------------------ | ----------------------------------------------------------- |
+| Priority Rank      | 1–30 (based on FAANG frequency)                             |
+| Question Name      | Design Twitter, etc.                                        |
+| Pattern            | Feed, CRUD, Payment, etc.                                   |
+| Sub-Pattern        | Fan-out, Locking, etc.                                      |
+| System Type        | Read-heavy / Write-heavy / Strong Consistency / Low Latency |
+| Core Concepts      | Caching, Sharding, MQ, etc.                                 |
+| Scale Assumption   | DAU / QPS                                                   |
+| Attempt 1 Date     | First try                                                   |
+| Attempt 2 Date     | Revision                                                    |
+| Bottlenecks Missed | Self-analysis                                               |
+| Tradeoffs Missed   | Self-analysis                                               |
+| Feedback Notes     | From mock                                                   |
+| Confidence         | Red / Yellow / Green                                        |
+| Status             | Not Started / In Progress / Done                            |
+
+---
+
+# 🟢 SHEET 3 — PATTERN MASTER SHEET
+
+Group by pattern:
+
+| Pattern | Sub-pattern | Core Focus | Questions Completed | Avg Confidence |
+| ------- | ----------- | ---------- | ------------------- | -------------- |
+
+Patterns to include:
+
+* CRUD / Storage
+* Feed / Timeline
+* Real-time Communication
+* Streaming / Media
+* Geospatial
+* Logging / Analytics
+* Critical Consistency
+* Infrastructure Utilities
+* Recommendation Systems
+
+---
+
+# 🟢 SHEET 4 — MOCK INTERVIEW LOG
+
+| Date | Question | Time Taken | Estimation Done? | API Defined? | Tradeoffs Explained? | Communication Rating (1–5) | Overall Rating |
+
+---
+
+# 📌 HOW YOU SHOULD USE THIS (Your Style)
+
+Because you're structured (like DP tracking):
+
+* Attempt 3 questions per pattern
+* Mark bottlenecks
+* Revisit weak ones after 10 days
+* Improve articulation
+
+---
+
+# 🔥 PART 2 — PRIORITY-ORDERED TOP 30 FAANG HLD QUESTIONS
+
+Ordered by:
+
+* Frequency in Google/Meta/Amazon loops
+* Coverage of core distributed patterns
+* Interview depth value
+
+---
+
+# 🥇 TIER 1 — ABSOLUTE MUST (Top 10)
+
+| Rank | Question                        | Pattern              | System Type        | Why High Priority         |
+| ---- | ------------------------------- | -------------------- | ------------------ | ------------------------- |
+| 1    | Design Twitter                  | Feed                 | Read-heavy         | Fan-out tradeoffs         |
+| 2    | Design WhatsApp                 | Real-time            | Low latency        | WebSockets + ordering     |
+| 3    | Design URL Shortener            | CRUD                 | Write-heavy        | Hashing + scaling         |
+| 4    | Design Instagram Feed           | Feed                 | Read-heavy         | Hybrid push/pull          |
+| 5    | Design Payment Gateway          | Critical Consistency | Strong ACID        | Idempotency               |
+| 6    | Design Uber                     | Geospatial           | Write-heavy        | Matching algorithm        |
+| 7    | Design Ticket Booking System    | Locking              | Strong consistency | Double booking prevention |
+| 8    | Design Distributed Rate Limiter | Infrastructure       | Write-heavy        | Token bucket              |
+| 9    | Design Distributed Cache        | Infra                | Read-heavy         | Consistent hashing        |
+| 10   | Design YouTube                  | Streaming            | Read-heavy         | CDN + transcoding         |
+
+---
+
+# 🥈 TIER 2 — VERY HIGH VALUE (11–20)
+
+| Rank | Question                   | Pattern    | System Type   | Focus              |
+| ---- | -------------------------- | ---------- | ------------- | ------------------ |
+| 11   | Design Facebook News Feed  | Feed       | Read-heavy    | Ranking            |
+| 12   | Design Google Drive        | Storage    | Storage-heavy | Chunking           |
+| 13   | Design Dropbox             | Storage    | Storage-heavy | Sync + dedupe      |
+| 14   | Design Slack               | Real-time  | Low latency   | Group chat         |
+| 15   | Design Netflix             | Streaming  | Read-heavy    | Adaptive streaming |
+| 16   | Design Google Maps         | Geospatial | Read-heavy    | Proximity search   |
+| 17   | Design E-commerce (Amazon) | CRUD       | Balanced      | Cart + sharding    |
+| 18   | Design Distributed Logging | Analytics  | Write-heavy   | Kafka pipeline     |
+| 19   | Design Metrics System      | Analytics  | Write-heavy   | Time-series        |
+| 20   | Design Search Autocomplete | Search     | Read-heavy    | Prefix index       |
+
+---
+
+# 🥉 TIER 3 — ADVANCED DEPTH (21–30)
+
+| Rank | Question                     | Pattern        | System Type           | Focus            |
+| ---- | ---------------------------- | -------------- | --------------------- | ---------------- |
+| 21   | Design Google Docs           | Collaboration  | Consistency-sensitive | OT / CRDT        |
+| 22   | Design Web Crawler           | Infrastructure | Write-heavy           | URL frontier     |
+| 23   | Design Spotify               | Streaming      | Read-heavy            | DRM              |
+| 24   | Design LinkedIn Connections  | Graph          | Write-heavy           | Graph traversal  |
+| 25   | Design Live Scoreboard       | Real-time      | Low latency           | Pub/Sub          |
+| 26   | Design Hotel Booking         | Locking        | Strong ACID           | Distributed lock |
+| 27   | Design Kafka-like System     | Infra          | High throughput       | Log partitioning |
+| 28   | Design Recommendation System | ML pipeline    | Read-heavy            | Feature store    |
+| 29   | Design CDN                   | Infra          | Read-heavy            | Edge caching     |
+| 30   | Design Unique ID Generator   | Infra          | Write-heavy           | Snowflake        |
+
+---
+
+# 🎯 STRATEGIC EXECUTION PLAN (For You)
+
+Since you're preparing seriously:
+
+### Month 1
+
+* Tier 1 fully
+* 3 mock interviews
+
+### Month 2
+
+* Tier 2 fully
+* 5 timed mock sessions
+
+### Month 3
+
+* Tier 3 + advanced
+* Multi-region variations
+
+---
+
+# 🧠 HOW TO PRACTICE (Optimally)
+
+For each question:
+
+1. 5 mins — Requirements
+2. 5 mins — Estimation
+3. 10 mins — Architecture
+4. 15 mins — Deep dive
+5. 5 mins — Bottlenecks
+
+Total: 40–45 minutes
+
+Time yourself.
+
+---
+
+# 🚀 If You Want Next:
+
+I can:
+
+* Generate a **download-ready Excel structure (column exact copy format)**
+* Run a **live mock interview simulation (Google-style)**
+* Give you **Tier 1 deep-dive architecture templates**
+* Create a **30-day structured HLD plan with daily targets**
+
+Tell me which one you want.
