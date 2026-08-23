@@ -1,0 +1,723 @@
+# Pastebin — Complete High-Level System Design
+### Interview Reference Guide | End-to-End Architecture Walkthrough
+
+**Topics Covered:** Introduction • Requirements • Capacity Estimation • API Design • Database Design • HLD Diagram Walkthrough • Component Deep-Dives • Scaling • Failure Scenarios • Security • Interview Summary
+
+---
+
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Requirements](#2-requirements)
+3. [Traffic Estimation & Capacity Planning](#3-traffic-estimation--capacity-planning)
+4. [API Design](#4-api-design)
+5. [Database Design](#5-database-design)
+6. [HLD Architecture — Diagram Walkthrough](#6-hld-architecture---diagram-walkthrough)
+7. [Key Generation Service (KGS) — Deep Dive](#7-key-generation-service-kgs---deep-dive)
+8. [Full High-Level Architecture](#8-full-high-level-architecture)
+9. [Caching Strategy — Multi-Layer](#9-caching-strategy---multi-layer)
+10. [Expiration & Cleanup — Three-Layer Design](#10-expiration--cleanup---three-layer-design)
+11. [Bloom Filter — Optimizing 404 Lookups](#11-bloom-filter---optimizing-404-lookups)
+12. [Multi-Region Deployment](#12-multi-region-deployment)
+13. [Trade-offs & Design Decisions](#13-trade-offs--design-decisions)
+14. [Failure Scenarios & Mitigations](#14-failure-scenarios--mitigations)
+15. [Security Considerations](#15-security-considerations)
+16. [Scaling to 100×](#16-scaling-to-100)
+17. [Key Differences: Video Diagram vs General HLD](#17-key-differences-video-diagram-vs-general-hld)
+18. [Interview Summary](#18-interview-summary)
+
+---
+
+## 1. Introduction
+
+Pastebin is a web service that lets users store plain text (code snippets, logs, config files, notes) and get back a unique short URL to share with others. Anyone with that URL can retrieve the stored content. The service must handle large text payloads efficiently, support high read traffic, enforce size/expiration limits, and optionally support syntax highlighting and user accounts.
+
+> 🔑 **Key Insight:** Unlike a URL shortener that just redirects (tiny payload), Pastebin must store and serve the full content — up to 10 MB of text per paste. This single difference drives the entire architecture toward object storage + CDN rather than a simple DB-backed redirect service.
+
+### What makes Pastebin unique?
+
+- **Large payload:** Each paste can be up to 10 MB of text — far too large to store efficiently in database rows.
+- **Content delivery, not redirect:** The system must serve the full content, not just do an HTTP 301 redirect.
+- **Bursty read traffic:** A paste shared by a popular user or viral link can get millions of hits in minutes.
+- **Expiration complexity:** Content has TTLs ranging from 10 minutes to never — requiring multi-layer expiry management.
+- **Read-heavy workload:** 100:1 read-to-write ratio demands aggressive caching at multiple levels.
+
+---
+
+## 2. Requirements
+
+### 2.1 Functional Requirements
+
+- **Create Paste:** Accept text content (up to 10 MB), generate a unique short key, return a shareable URL.
+- **Read Paste:** Given a short key, return the stored text content with metadata.
+- **Custom Alias (optional):** Users can define a custom short path (e.g., `/my-query`).
+- **Expiration (optional):** Pastes expire after a TTL — 10 min, 1 hr, 1 day, 1 month, or never.
+- **Syntax Highlighting (optional):** Store a language hint; client-side rendering handles display.
+- **Visibility (optional):** Public (listed), Unlisted (link-only), Private (auth required).
+- **User Accounts (optional):** Manage pastes, view history, edit/delete owned pastes.
+- **Delete Paste:** Owner or admin can delete before expiration.
+
+### 2.2 Non-Functional Requirements
+
+- **High Availability:** 99.99% uptime — reads must never fail during partial outages.
+- **Low Latency:** Read paste < 100 ms; create paste < 500 ms.
+- **Scalability:** 1 million new pastes/day; 100 million reads/day (100:1 read:write ratio).
+- **Durability:** Content must never be lost — replicated storage + backups.
+- **Storage Efficiency:** Text blobs stored cheaply at scale using object storage, not DB rows.
+- **Security:** Rate limiting, malware/spam detection, XSS prevention.
+
+> 💡 **Clarifying Questions to ask in interviews:** Is there a size limit on pastes? Are pastes public by default? Do we need user auth? Should we support analytics (view counts)? What's the max expiry duration? Can guests create pastes without login?
+
+---
+
+## 3. Traffic Estimation & Capacity Planning
+
+### 3.1 Assumptions
+
+| Parameter | Value |
+|-----------|-------|
+| New pastes per day | 1 million |
+| Average paste size | 10 KB (max 10 MB) |
+| Read : Write ratio | 100 : 1 |
+| Peak traffic factor | 3× average; viral paste up to 50× |
+| Metadata record size | ~300 bytes per paste |
+| Data retention | 5 years for permanent pastes |
+| Replication factor | 3× |
+
+### 3.2 Calculations
+
+| Metric | Calculation & Result |
+|--------|----------------------|
+| Write QPS (avg) | 1M ÷ 86,400 ≈ **11.6 writes/sec** |
+| Write QPS (peak 3×) | **~35 writes/sec** |
+| Read QPS (avg) | 100M ÷ 86,400 ≈ **1,157 reads/sec** |
+| Read QPS (peak 3×) | **~3,470 reads/sec** |
+| Daily storage (content) | 1M × 10 KB = **10 GB/day** |
+| 5-year storage (3× replication) | 10 GB × 365 × 5 × 3 ≈ **54.75 TB** |
+| Daily metadata storage | 1M × 300 B = **300 MB/day** |
+| Egress bandwidth | 1,157 reads/sec × 10 KB ≈ **11.5 MB/sec (~1 TB/day)** |
+
+> 🔑 **Key Insight:** Content storage dominates all other concerns. 54.75 TB of text blobs cannot live in database rows — this is definitively an object storage (S3) problem. The database stores only lightweight metadata pointers.
+
+---
+
+## 4. API Design
+
+Style: REST, JSON metadata, raw text body. Versioned at `/v1/`. All endpoints behind HTTPS with HSTS.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/pastes` | POST | Create a new paste — returns paste_key + URL |
+| `/v1/pastes/{pasteKey}` | GET | Retrieve paste content + metadata |
+| `/v1/pastes/{pasteKey}` | DELETE | Delete a paste (owner/admin auth required) |
+| `/v1/users/{userId}/pastes` | GET | List all pastes for a user (auth required) |
+
+### POST /v1/pastes — Request
+
+```json
+{
+  "content": "SELECT * FROM users WHERE id = 1;",
+  "language": "sql",
+  "custom_alias": "my-query",
+  "expiration": "1d",
+  "visibility": "public"
+}
+```
+
+### POST /v1/pastes — Response (201 Created)
+
+```json
+{
+  "paste_key": "aB3kZ9",
+  "paste_url": "https://pastebin.com/aB3kZ9",
+  "created_at": "2025-04-08T10:00:00Z",
+  "expires_at": "2025-04-09T10:00:00Z",
+  "size_bytes": 34
+}
+```
+
+### GET /v1/pastes/{pasteKey} — Response (200 OK)
+
+```json
+{
+  "paste_key": "aB3kZ9",
+  "content": "SELECT * FROM users WHERE id = 1;",
+  "language": "sql",
+  "created_at": "2025-04-08T10:00:00Z",
+  "expires_at": "2025-04-09T10:00:00Z",
+  "view_count": 142
+}
+```
+
+Returns `404 Not Found` if key doesn't exist, `410 Gone` if expired.
+
+### Rate Limiting
+
+- **Anonymous users:** 10 paste creates/hour per IP — token bucket in Redis. Returns `429 Too Many Requests` with `Retry-After` header.
+- **Authenticated users:** Higher limits based on account tier.
+- **Idempotency:** `Idempotency-Key` header supported on POST to prevent duplicates on retry.
+
+---
+
+## 5. Database Design
+
+Pastebin has two fundamentally different storage needs that must be handled separately.
+
+### 5.1 Why Two Stores?
+
+| | Metadata Store | Content Store |
+|--|----------------|---------------|
+| **Technology** | DynamoDB | Amazon S3 |
+| **Data type** | Small, structured, queryable | Large blobs, unstructured |
+| **Size per record** | ~300 bytes | Up to 10 MB |
+| **Access pattern** | Key lookup, user listing | Blob fetch via path |
+| **Scale model** | Horizontal partitioning | Infinite object storage |
+
+### 5.2 DynamoDB — Metadata Store
+
+DynamoDB is the right choice here. The primary access pattern is always a direct lookup by `paste_key` — a perfect fit for a key-value store. DynamoDB also provides built-in TTL (auto-expires rows at `expires_at` without a cron job), native multi-region via Global Tables, and a GSI on `user_id` for listing a user's pastes — all with no operational overhead.
+
+**Table: `pastes`**
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `paste_key` | String (PK) | 8-char Base62 unique identifier |
+| `user_id` | String (GSI) | Optional — owner of the paste |
+| `s3_object_key` | String | Pointer to blob: `s3://pastebin/{paste_key}.txt` |
+| `language` | String | Syntax hint for client rendering (e.g., "python", "sql") |
+| `visibility` | Enum | `public` / `unlisted` / `private` |
+| `created_at` | Number (epoch) | Timestamp of paste creation |
+| `expires_at` | Number (epoch) | DynamoDB TTL attribute — NULL means never expires |
+| `size_bytes` | Number | Content size in bytes |
+| `view_count` | Number | Denormalized counter updated asynchronously |
+
+**Key DynamoDB features used:**
+- **DynamoDB TTL:** Set `expires_at` as the TTL attribute — DynamoDB automatically deletes expired rows. No cleanup cron needed for metadata.
+- **GSI on `user_id`:** Allows efficient `LIST /users/{userId}/pastes` queries without a full scan.
+- **Conditional writes:** `PutItem` with `ConditionExpression = "attribute_not_exists(paste_key)"` for custom alias conflict detection — returns `ConditionalCheckFailedException` if alias is already taken.
+- **DynamoDB Streams:** Triggers cleanup events when rows are deleted — downstream cleanup worker removes orphaned S3 blobs.
+- **Point-In-Time Recovery (PITR):** Full metadata recovery to any second in the last 35 days.
+- **DynamoDB Global Tables:** Active-active multi-region replication with automatic conflict resolution.
+
+### 5.3 DynamoDB vs SQL — Why DynamoDB Wins Here
+
+| Concern | DynamoDB | Postgres |
+|---------|----------|----------|
+| Primary access pattern | Direct key lookup (PK) ✅ | Also good but heavier |
+| Auto-expiry of rows | Built-in TTL attribute ✅ | Requires cleanup cron job |
+| Multi-region | Global Tables (native) ✅ | Requires Patroni/BDR setup |
+| Horizontal scaling | Auto-scales with no sharding config ✅ | Manual sharding |
+| Operational burden | Fully managed, serverless ✅ | Requires DBA management |
+| Complex queries / joins | No joins (use GSI) ⚠️ | Full SQL support |
+| ACID transactions | Supported (limited) | Full ACID |
+
+For Pastebin, there are no complex joins needed. The access patterns are: lookup by `paste_key`, list by `user_id`. Both are perfectly served by DynamoDB's primary key + GSI model.
+
+### 5.4 S3 — Content Store
+
+Each paste's text is stored as a single S3 object: `s3://pastebin-content/{paste_key}.txt`
+
+**Why not the database?**
+- Text blobs up to 10 MB stored in DB rows blow up storage costs and degrade index performance.
+- S3 is designed exactly for this: cheap (~$0.023/GB/month), durable (11 nines), infinitely scalable.
+- S3 is CDN-native — CloudFront pulls directly from S3 as the origin.
+
+**S3 configuration:**
+- **Versioning:** Enabled — protects against accidental deletion.
+- **Cross-Region Replication (CRR):** Copies every object to a backup region automatically.
+- **Lifecycle Policies:** Auto-transitions old objects to Glacier; deletes objects with expiry tags.
+- **Intelligent-Tiering:** Automatically moves infrequently accessed objects to cheaper storage classes.
+- **Compression:** All content gzip/zstd compressed before storage — typical 60–80% size reduction.
+
+### 5.5 Consistency Model
+
+- **Creates:** Upload to S3 first, then write metadata to DynamoDB. If DynamoDB write fails after S3 succeeds, a nightly cleanup job finds orphaned S3 objects (no DB entry after 24h grace) and deletes them.
+- **Reads:** Eventual consistency acceptable — a new paste may take ~1 second to appear in all regions. Fine for this use case.
+- **Custom aliases:** Use strong consistent conditional write (`ConditionExpression`) to prevent two users claiming the same alias simultaneously.
+- **Deletes:** Soft-delete metadata first (mark `deleted=true`), then async S3 deletion by cleanup worker.
+
+---
+
+## 6. HLD Architecture — Diagram Walkthrough
+
+This section walks through the architecture as taught in the video, explaining each component and the data flow between them.
+
+### 6.1 The Big Picture — System Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                            THE BIG PICTURE                               │
+│                                                                          │
+│  User (Creator) ──┐                    SPOP cmd    ┌──────────────────┐  │
+│                   │               ┌──────────────▶ │ Redis (key pool) │  │
+│                   ▼               │                │   1–5M keys      │  │
+│                  CDN ──▶ Load Balancer ──▶ Paste   │                  │  │
+│                   ▲               │  Creation Svc  │  Redis Sentinel  │  │
+│  User (Reader) ───┘               │                └──────────────────┘  │
+│                                   │  text storage           ▲ SCARD      │
+│                                   │  ─────────────▶  S3     │            │
+│                                   │                      Key Gen Svc     │
+│                                   │                                       │
+│                                   ▼  Cache-Aside                         │
+│                             Paste Retrieval ──▶ Redis (Metadata Cache)   │
+│                                   Svc          │  creation_time          │
+│                                   │            │  expiration_time        │
+│                                   │            │  storage_path           │
+│                                   │            └─────────────────────────┤
+│                                   ▼                                       │
+│                              DynamoDB ──▶ Global Tables (multi-region)   │
+│                             (DB Schema: paste_key, created_at,            │
+│                              expires_at, size_bytes, s3_object_key)      │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### 6.2 Component-by-Component Explanation
+
+#### ① CDN (Content Delivery Network)
+
+The CDN sits between users and the load balancer. It is the first line of defense for read traffic.
+
+- **For Creators:** A user pasting content hits the CDN → load balancer → Paste Creation Service. The CDN is mostly transparent for writes.
+- **For Readers:** A user requesting an existing paste checks the CDN edge cache first. If the paste is cached (**cache hit**), content is returned immediately — no app server, no database, no S3 involved.
+- **Cache Miss:** On a CDN miss, the request passes to the load balancer and retrieves the paste from S3 (the CDN's origin). The CDN then caches this response for future requests.
+- **Why this matters:** A viral paste shared by thousands of users is served entirely at the CDN edge. The origin infrastructure sees zero load.
+
+#### ② Load Balancer
+
+Distributes incoming HTTPS traffic across multiple instances of the Paste Creation and Paste Retrieval services.
+
+- **TLS Termination:** Decrypts HTTPS once, forwards plain HTTP internally.
+- **Health Checks:** Removes unhealthy app server instances within seconds.
+- **Traffic Routing:** Routes POST to the creation service and GET to the retrieval service via path-based rules.
+- **Stateless backend:** Since app servers hold no session state, any request can go to any server.
+
+#### ③ Paste Creation Service
+
+Handles all write operations — accepts user content, generates a unique key, stores the blob, writes metadata.
+
+**Step-by-step creation flow:**
+
+1. **Validate:** content size ≤ 10 MB, alias is URL-safe, expiry range valid.
+2. **Spam/malware check:** basic heuristics, PII detection, length anomalies.
+3. **Fetch key:** `SPOP pastebin:keys` from the Redis key pool — atomically claims one pre-generated Base62 key.
+4. **Upload to S3:** `PUT s3://pastebin-content/{paste_key}.txt`
+5. **Write metadata to DynamoDB:** `paste_key`, `user_id`, `s3_object_key`, `expires_at` (TTL attribute), `size_bytes`.
+6. **Optionally pre-warm** the Redis metadata cache with the new entry.
+7. **Return** the paste URL to the client.
+
+#### ④ Paste Retrieval Service
+
+Handles all read operations. Implements a **Cache-Aside** pattern to minimize DynamoDB load.
+
+**Step-by-step retrieval flow:**
+
+1. Client requests `GET /{pasteKey}`.
+2. **CDN check:** If cached at edge, return immediately. No further processing.
+3. **Redis metadata cache:** Look up `paste_key` → `{s3_object_key, expiration_time, creation_time}`.
+4. **Cache hit:** Verify not expired. Fetch content from S3 using `s3_object_key`. Return to client.
+5. **Cache miss:** Query DynamoDB for metadata. If not found → `404`. If expired → `410 Gone`. If found → populate Redis cache, fetch S3 content, return.
+6. **Async:** Publish view event to analytics pipeline (Kafka/SQS).
+
+#### ⑤ Redis — Key Pool (SPOP + Key Generation Service)
+
+This is one of the most elegant components of the design. Two Redis instances serve different purposes.
+
+> The Key Pool Redis is pre-loaded with **1–5 million unique Base62 keys**. When a paste is created, the Paste Creation Service calls `SPOP` (Set Pop) to atomically claim one key. The Key Generation Service (KGS) monitors the pool via `SCARD` and refills when it drops below a threshold.
+
+- **Why SPOP?** `SPOP` atomically removes and returns a random member from a Redis Set. No two servers ever get the same key, even under concurrent load — no locks, no collision checks.
+- **Why pre-generate?** Avoids collision checking at write time. The KGS already guaranteed uniqueness when filling the pool.
+- **SCARD monitoring:** KGS watches pool size. When `SCARD` drops below ~500K keys, it generates more and pushes them in asynchronously — never blocks paste creation.
+- **Redis Sentinel:** Provides HA for the key pool. If the primary goes down, Sentinel promotes a replica automatically within seconds.
+- **Key space:** Base62 with 8 chars = 62⁸ ≈ **218 trillion unique keys**. At 1M pastes/day, this lasts ~600,000 years.
+
+#### ⑥ Redis — Metadata Cache (Cache-Aside)
+
+A separate Redis instance caches paste metadata for fast retrieval without hitting DynamoDB every time.
+
+- **What is cached:** `paste_key` → `{ s3_object_key, creation_time, expiration_time }`. Not the actual content — that's S3/CDN's job.
+- **Cache-Aside pattern:** App checks Redis first. On a miss, reads from DynamoDB and populates the cache.
+- **TTL:** Cache entries have `TTL = min(1 hour, time_to_expiry)`. Ensures no stale data is served after paste expiration.
+- **LRU eviction:** Least Recently Used eviction removes cold metadata when memory is full.
+- **Redis Sentinel:** Same HA pattern — automatic failover.
+
+#### ⑦ S3 (Object Storage)
+
+Primary content store for all paste text blobs. The database stores only the pointer (`s3_object_key`).
+
+- **Storage path:** `s3://pastebin-content/{paste_key}.txt`
+- **Cross-Region Replication:** S3 CRR copies every object to backup regions automatically.
+- **CDN integration:** S3 acts as the CDN origin. CloudFront pulls content from S3 on cache miss and serves globally.
+- **Lifecycle policies:** Auto-deletes objects with expiry tags after N days — safety net for cleanup.
+- **Compression:** All text gzip/zstd compressed before storage (60–80% size reduction).
+
+#### ⑧ DynamoDB (+ Global Tables)
+
+The metadata database. Stores lightweight structured records about each paste — never the content itself.
+
+**Schema:**
+
+```
+Table: pastes
+┌─────────────────┬──────┬─────────────────────────────────────────────────────┐
+│ Attribute       │ Type │ Description                                         │
+├─────────────────┼──────┼─────────────────────────────────────────────────────┤
+│ paste_key       │  S   │ Partition Key — 8-char Base62 identifier            │
+│ user_id         │  S   │ GSI — enables listing pastes by user                │
+│ s3_object_key   │  S   │ S3 path e.g. s3://pastebin/aB3kZ9.txt              │
+│ created_at      │  N   │ Unix epoch timestamp                                │
+│ expires_at      │  N   │ DynamoDB TTL attribute (NULL = never expires)       │
+│ size_bytes      │  N   │ Content size for storage tracking                   │
+│ language        │  S   │ Optional syntax hint ("python", "sql", etc.)        │
+│ visibility      │  S   │ public / unlisted / private                         │
+│ view_count      │  N   │ Denormalized counter updated async                  │
+└─────────────────┴──────┴─────────────────────────────────────────────────────┘
+```
+
+- **DynamoDB TTL:** The `expires_at` attribute is registered as the TTL field. DynamoDB automatically deletes rows at expiry — no cron job needed for metadata cleanup.
+- **Global Secondary Index (GSI) on `user_id`:** Efficient listing of a user's paste history.
+- **DynamoDB Global Tables:** Active-active multi-region replication — every region has a full writable copy. Replicated within seconds globally.
+- **Point-In-Time Recovery (PITR):** Full metadata recovery to any point in the last 35 days.
+- **DynamoDB Streams:** Emits change events on row deletion — triggers the S3 cleanup worker to delete corresponding blobs.
+
+---
+
+## 7. Key Generation Service (KGS) — Deep Dive
+
+The KGS is a background service that generates unique Base62 keys and fills the Redis key pool.
+
+### 7.1 Key Generation Algorithm
+
+- **Encoding:** Base62 (`[a-zA-Z0-9]`) — all characters are URL-safe. No special characters.
+- **Key length:** 8 characters → 62⁸ ≈ 218 trillion combinations.
+- **Approach A — Pre-generated pool:** KGS generates random Base62 strings, checks uniqueness, and pushes valid keys into a Redis Set. App servers `SPOP` a key on demand.
+- **Approach B — Snowflake ID:** Timestamp (41 bits) + Machine ID (10 bits) + Sequence (12 bits) → Base62 encoded. No separate DB check; uniqueness guaranteed by construction.
+
+### 7.2 SPOP Flow in Detail
+
+```
+Paste Creation Service                Redis Key Pool
+        │                                    │
+        │──── SPOP pastebin:keys ───────────▶│
+        │                                    │ (atomically removes & returns 1 key)
+        │◀─── "aB3kZ9" ─────────────────────│
+        │                                    │
+        │                     Key Generation Service
+        │                                    │◀── SCARD pastebin:keys
+        │                                    │    (check pool size)
+        │                              If size < 500K:
+        │                                    │── generate batch of keys
+        │                                    │── SADD pastebin:keys key1 key2 ...
+```
+
+### 7.3 Custom Aliases
+
+- **Conditional write:** DynamoDB `PutItem` with `ConditionExpression = "attribute_not_exists(paste_key)"`.
+- **Conflict:** If alias already taken, DynamoDB throws `ConditionalCheckFailedException` → return `409 Conflict` to client.
+- **Validation:** Alias must be alphanumeric, URL-safe, 3–50 characters max.
+
+---
+
+## 8. Full High-Level Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────────────┐
+│   Clients   │────▶│  DNS/GeoDNS  │────▶│   CDN (CloudFront)   │
+│ (Web/App)   │     │  (Route 53)  │     │  Cache paste content │
+└─────────────┘     └──────────────┘     └──────────┬───────────┘
+                                                     │ cache miss
+                                                     ▼
+          ┌──────────────────────────────────────────────────────────┐
+          │                   Load Balancer (AWS ALB)                │
+          └──────────────────────────────────────────────────────────┘
+                     │                          │
+           ┌─────────┴──────────┐    ┌──────────┴─────────┐
+           │  Paste Creation    │    │  Paste Retrieval   │
+           │    Service         │    │    Service         │
+           └────────┬───────────┘    └──────────┬─────────┘
+                    │                            │
+          ┌─────────▼──────┐          ┌──────────▼────────┐
+          │ Redis Key Pool │          │  Redis Metadata   │
+          │ (SPOP, 1–5M)   │          │  Cache            │
+          │ Redis Sentinel │          │  (Cache-Aside)    │
+          └────────┬───────┘          │  Redis Sentinel   │
+                   │                  └──────────┬────────┘
+                   │  text storage               │ cache miss
+                   ▼                             ▼
+                 ┌────┐                  ┌────────────────┐
+                 │ S3 │◀─── CDN origin   │   DynamoDB     │
+                 └────┘                  │ (Global Tables)│
+                   ▲                     └────────────────┘
+                   │ s3_object_key              │
+                   └────────────────────────────┘
+                                                │
+                                    ┌───────────▼────────────┐
+                                    │   Message Queue        │
+                                    │   (Kafka / SQS)        │
+                                    └──────────┬─────────────┘
+                              ┌────────────────┴───────────────┐
+                              ▼                                 ▼
+                    ┌──────────────────┐           ┌───────────────────────┐
+                    │ Analytics Workers│           │ Expiry/Cleanup Worker │
+                    │ (ClickHouse)     │           │ Consume DynamoDB      │
+                    └──────────────────┘           │ Streams → delete S3   │
+                                                   └───────────────────────┘
+```
+
+### 8.1 Component Role Summary
+
+| Component | Role |
+|-----------|------|
+| CDN (CloudFront) | Caches paste content at edge globally. S3 is CDN origin. Viral pastes served entirely from edge — zero app server load. |
+| Load Balancer | Terminates TLS, distributes traffic, health checks. Routes writes to creation, reads to retrieval. |
+| Paste Creation Service | Validates input, gets key via SPOP, uploads to S3, writes metadata to DynamoDB. Stateless. |
+| Paste Retrieval Service | Implements Cache-Aside — Redis first, then DynamoDB on miss. Fetches content from S3. Stateless. |
+| Redis Key Pool | Pre-generated Base62 key pool. SPOP ensures atomic, collision-free key assignment. |
+| Key Generation Service | Background job. Monitors pool via SCARD, generates and pushes keys when pool runs low. |
+| Redis Metadata Cache | Cache-Aside store. Holds `paste_key → {s3_object_key, expiry, created_at}`. LRU eviction. |
+| Redis Sentinel | HA monitor for both Redis instances. Auto-promotes replica on primary failure. |
+| DynamoDB (Global Tables) | Metadata DB. Built-in TTL for auto-expiry. GSI on `user_id`. Multi-region via Global Tables. |
+| S3 | All paste content as blobs. Infinite scale, CDN origin, CRR, lifecycle policies. |
+| Kafka/SQS | Async event bus. Decouples view analytics and S3 cleanup from the critical read/write path. |
+| Analytics Workers | Aggregate view counts and geo stats into ClickHouse for reporting. |
+| Cleanup Worker | Consumes DynamoDB Streams on row deletion → deletes corresponding S3 blobs. |
+
+---
+
+## 9. Caching Strategy — Multi-Layer
+
+Pastebin employs multiple caching layers, each serving a distinct purpose.
+
+| Cache Layer | What is Cached | TTL / Eviction |
+|-------------|---------------|----------------|
+| CDN (CloudFront) | Full paste content (text response) | `Cache-Control` header; ~1 hour for public pastes |
+| App Server In-Process LRU | Top ~1,000 hottest paste metadata keys | In-memory; evicted on restart or capacity exceeded |
+| Redis Metadata Cache | `paste_key → {s3_object_key, expiry, language}` | `min(1 hour, time_to_paste_expiry)`; LRU eviction |
+| DynamoDB DAX (optional) | DynamoDB item cache for read-heavy scenarios | Microsecond latency; replaces Redis cache if adopted |
+| S3 (authoritative) | All paste blobs | Permanent until lifecycle policy or manual delete |
+
+### Hot / Viral Paste Handling
+
+- **CDN caching:** `Cache-Control: public, max-age=3600` for public pastes. CloudFront caches at edge globally.
+- **Private/unlisted pastes:** `Cache-Control: private, no-store` — CDN bypasses caching. App server validates auth then proxies from S3.
+- **In-process cache:** App servers maintain a tiny local LRU of the top 1,000 keys to absorb viral spikes without Redis round-trips.
+- **Pre-signed S3 URLs:** Instead of proxying content, generate a time-limited S3 URL (valid 60 sec) and redirect the client directly. Offloads all content bandwidth to S3/CDN.
+
+---
+
+## 10. Expiration & Cleanup — Three-Layer Design
+
+Expiration is handled at three independent layers to ensure no paste outlives its TTL.
+
+| Layer | Mechanism | Limitation |
+|-------|-----------|------------|
+| **Redis TTL** | Cache entry expires at `min(1h, time_to_expiry)`. Prevents stale reads from cache. | Only covers cached pastes; doesn't clean DynamoDB or S3. |
+| **DynamoDB TTL** | `expires_at` attribute registered as TTL field. DynamoDB auto-deletes rows. DynamoDB Streams triggers cleanup worker. | Eventual — row deletion can lag up to 48 hours. |
+| **S3 Lifecycle Policy** | Auto-deletes objects with expiry tag after N days. Works independently of app. | Eventual — not immediate on exact expiry second. |
+
+### Cleanup Worker Flow
+
+1. Consumes **DynamoDB Streams** events (triggered when DynamoDB TTL deletes a row).
+2. For each deleted metadata row, extracts `s3_object_key`.
+3. Batch-deletes the corresponding S3 objects (far more efficient than one-at-a-time).
+4. After deletion, requests for expired paste URLs return `404` from S3 (object no longer exists).
+5. A **nightly reconciliation job** also scans S3 for objects with no corresponding DynamoDB entry (orphaned blobs from failed writes) and deletes them after a 24-hour grace period.
+
+> **Why the grace period?** A paste created in the last 24 hours might not yet have propagated to all DynamoDB regions. The grace period prevents false-positive orphan deletion.
+
+---
+
+## 11. Bloom Filter — Optimizing 404 Lookups
+
+A Bloom filter is a memory-efficient probabilistic data structure that sits in front of the cache to eliminate DynamoDB lookups for non-existent paste keys — critical defense against key-scanning bots.
+
+### How it works
+
+A request for paste key `X` arrives. Before hitting Redis or DynamoDB, check the Bloom filter:
+
+- **"Definitely not present"** → Bloom filter returns false. Return `404` immediately. No Redis query. No DB query.
+- **"Possibly present"** → Proceed with normal lookup. May still get a `404` from DynamoDB (false positive), but that's rare (~0.1%).
+
+| Property | Detail |
+|----------|--------|
+| False positives | Possible (rare ~0.1%) — filter says "exists" but doesn't. Costs one extra DB lookup. |
+| False negatives | **Impossible** — filter never says "not exists" for a key that actually exists. |
+| Memory usage | ~50 MB for 100 million entries (vs GBs for a hashmap) |
+| Rebuild frequency | Nightly from full DynamoDB scan; fits entirely in RAM |
+| Key benefit | Eliminates entire class of bot abuse (key-scanning attacks) |
+
+---
+
+## 12. Multi-Region Deployment
+
+### Geo-Routing
+
+Route53 GeoDNS routes users to the nearest region — typical regions: US-East, EU-West, AP-Southeast.
+
+### Active-Active Replication
+
+- **Each region:** Full stack — app servers, Redis, DynamoDB Global Tables, S3 with CRR.
+- **Writes:** Accepted in any region, replicated globally within seconds via DynamoDB Global Tables.
+- **Reads:** Served from local region for lowest latency.
+- **S3 CRR:** Cross-Region Replication ensures paste content is available globally.
+- **Conflict resolution:** Paste keys are write-once and unique — no conflict possible. Custom aliases use DynamoDB conditional writes (`attribute_not_exists`) per region; race conditions across regions are ultra-rare and handled by client retry with a new alias.
+
+### Regional Failover
+
+If US-East degrades, Route53 health checks detect the failure within ~10 seconds and redirect all traffic to EU-West within 60 seconds. Because DynamoDB Global Tables and S3 CRR are already replicated, users experience only brief disruption — **zero data loss**.
+
+---
+
+## 13. Trade-offs & Design Decisions
+
+| Decision | Trade-off |
+|----------|-----------|
+| **DynamoDB over SQL for metadata** | DynamoDB: built-in TTL, horizontal scale, Global Tables, zero operational overhead, native GSI. Trade-off: no complex joins (solved by GSI for user queries); eventual consistency requires careful thinking around reads. |
+| **S3 for content vs DB BLOBs** | S3: infinitely scalable, cheap, CDN-native. DB BLOBs kill index performance and cost 10× more. Trade-off: extra complexity managing S3 + metadata pointer separately. |
+| **CDN for content vs proxying through app** | CDN: eliminates origin load for viral pastes, global low latency. Trade-off: private/expiring pastes can't use CDN — must proxy through app to enforce auth/expiry. |
+| **Pre-signed S3 URLs vs content proxy** | Pre-signed: offloads all bandwidth to S3. Trade-off: URL leakage (shared pre-signed URL valid for 60s). Acceptable for non-sensitive public content. |
+| **DynamoDB TTL for expiry** | Automatic, serverless, no cron job. Trade-off: TTL deletion is eventual (up to 48h lag). Mitigated by Redis TTL catching stale reads at the cache layer. |
+| **Eventual vs Strong Consistency** | Eventual: cheaper, faster, used for reads. Strong: used only for custom alias conditional writes. Trade-off: a newly created paste may take ~1s to appear globally. |
+| **Async analytics via Kafka** | Decouples view counting from read path — zero latency penalty. Trade-off: view counts are eventually consistent, not real-time. |
+| **SPOP for key generation vs UUID at write time** | SPOP: pre-generated, guaranteed unique, fast atomic pop. UUID: simpler but requires collision check at write time against DynamoDB. |
+
+---
+
+## 14. Failure Scenarios & Mitigations
+
+| Failure | Impact | Mitigation |
+|---------|--------|------------|
+| **S3 outage** | Reads return 503; new pastes cannot be stored | S3 CRR; CDN edge cache serves ~80% of popular content; retry writes to backup region |
+| **DynamoDB node/AZ down** | Metadata reads fail on cache miss | DynamoDB multi-AZ by default; Redis cache absorbs most reads during DB recovery; Global Tables for regional failover |
+| **Redis cache failure** | All reads fall through to DynamoDB | DynamoDB handles the load; Redis Sentinel prevents total failure via automatic failover |
+| **App server failure** | Traffic spike to remaining servers | Stateless; auto-scaling group; ALB health checks remove dead nodes in seconds |
+| **KGS failure / key pool empty** | Cannot generate new paste keys | App servers hold local key batch; fallback to Snowflake ID generation |
+| **Kafka lag / failure** | Analytics delayed; view counts stale | Analytics is non-critical path; Kafka replicated across brokers; degrades gracefully |
+| **Cleanup worker failure** | Orphaned S3 blobs not deleted | S3 Lifecycle Policies act as safety net; DynamoDB TTL handles metadata; nightly reconciliation job on restart |
+| **DDoS / spam paste flood** | Storage abuse, bandwidth drain | Redis token bucket rate limiting; CAPTCHA for anonymous users; WAF rules; content size limits |
+| **Regional outage** | Entire region unavailable | Route53 health checks + failover; DynamoDB Global Tables + S3 CRR mean no data loss |
+| **DynamoDB write succeeds, S3 upload fails** | Metadata row with no content | Creation service rolls back: delete DynamoDB row, return 500 to client with retry |
+| **S3 write succeeds, DynamoDB write fails** | Orphaned S3 blob | Nightly cleanup job deletes S3 objects with no DynamoDB entry after 24h grace period |
+| **Accidental mass deletion** | Data loss | DynamoDB PITR (35-day recovery); S3 versioning; soft deletes with 30-day grace before hard delete |
+
+---
+
+## 15. Security Considerations
+
+- **Rate Limiting:** Anonymous: 10 pastes/hour, 100 reads/min per IP. Redis token bucket. Returns `429` with `Retry-After`.
+- **Content Scanning:** Heuristics for malware signatures, PII patterns (credit card, SSN), spam. Optional: ClamAV or VirusTotal API integration.
+- **XSS Prevention:** Always serve paste content as `Content-Type: text/plain` — never rendered as HTML by the API. Syntax highlighting done client-side on sanitized text only.
+- **Private Pastes:** Never cached by CDN (`Cache-Control: private, no-store`). Served only by app server after auth check. Pre-signed S3 URLs not issued to public clients.
+- **HTTPS Everywhere:** TLS enforced. HSTS headers. All HTTP redirected to HTTPS.
+- **Authentication:** JWT or session cookie for user accounts. API keys for programmatic access with configurable per-key rate limits.
+- **CORS:** Restricted to known origins (web app, mobile app). API not open to arbitrary origins.
+- **WAF:** AWS WAF rules block known bot patterns, SQL injection in URLs, oversized headers.
+- **Abuse Reporting:** Flagging endpoint + human review queue. Immediate takedown via soft-delete for CSAM, illegal content, doxxing.
+- **DynamoDB IAM Policies:** App servers granted least-privilege IAM roles — creation service can only `PutItem`; retrieval service can only `GetItem`; neither can `DeleteTable`.
+
+---
+
+## 16. Scaling to 100×
+
+### Bottleneck 1 — Read Traffic (100× reads)
+
+Push all public content reads to the CDN edge. 100× reads = manageable if CDN absorbs them. CloudFront scales automatically — costs linearly (egress bill rises, but infrastructure does not need manual scaling).
+
+### Bottleneck 2 — Write Traffic (100× writes)
+
+DynamoDB auto-scales write capacity units with no sharding configuration. S3 scales infinitely. KGS handles write throughput via pre-generated key batches — no contention on key generation even at 3,500 writes/sec.
+
+### Bottleneck 3 — Bandwidth
+
+S3 + CloudFront CDN is engineered for TB/sec egress. The only real scaling cost at 100× is the CDN egress bill. **Optimization:** gzip/zstd compression reduces effective egress 60–80%.
+
+### Storage Cost Optimization at Scale
+
+- **S3 Intelligent-Tiering:** Moves infrequently accessed objects to IA/Glacier automatically. Old pastes cost 3–10× less per GB.
+- **Compression:** gzip/zstd before storage reduces 54 TB to ~11–22 TB effective.
+- **Hard expiry policy:** Delete all pastes after 1 year unless user has a paid account. Most content is accessed in the first week after creation.
+
+---
+
+## 17. Key Differences: Video Diagram vs General HLD
+
+| Video Diagram Component | Relationship to Full HLD |
+|------------------------|--------------------------|
+| Paste Creation Service | Same as full HLD. Handles all writes — validation, key retrieval, S3 upload, DB write. |
+| Paste Retrieval Service | Same as full HLD. Implements Cache-Aside with Redis metadata cache. |
+| Redis (Key Pool) + SPOP | Key pool pre-loaded by KGS. SPOP is the atomic, collision-free key retrieval command. |
+| Redis (Metadata Cache) + Cache-Aside | Caches `paste_key → {storage_path, creation_time, expiration_time}`. Falls back to DynamoDB on miss. |
+| Redis Sentinel (both) | HA pattern. Both Redis instances protected by Sentinel for automatic failover. |
+| Key Generation Service (KGS) | Background job. Uses SCARD to monitor pool size, generates and pushes Base62 keys when low. |
+| S3 (text storage) | Blob store for all paste content. Connected to CDN as origin. `s3_object_key` stored in DynamoDB. |
+| Postgres + Replica (video) → **DynamoDB + Global Tables** | DynamoDB replaces Postgres. Built-in TTL, auto-scaling, Global Tables for multi-region. No read replica needed — DynamoDB handles both read and write natively. |
+| CDN (implied) | Sits in front of everything. First check for readers. S3 acts as CDN origin. |
+
+---
+
+## 18. Interview Summary
+
+### Key Design Decisions to Memorize
+
+- **Content in S3, metadata in DynamoDB:** The fundamental Pastebin insight. Never store blobs in your DB rows.
+- **CDN as the primary read path:** CloudFront serves public paste content at the edge — app servers rarely involved in reads.
+- **KGS + Redis SPOP for key generation:** Pre-generated batches eliminate collision checking. SPOP gives atomic, lock-free key claiming.
+- **DynamoDB TTL for expiry:** Register `expires_at` as the TTL attribute — DynamoDB auto-deletes expired rows. No cron job for metadata cleanup.
+- **Three-layer expiry:** Redis TTL + DynamoDB TTL + S3 Lifecycle Policy together guarantee clean expiration with no single point of failure.
+- **Cache-Aside with Redis Sentinel:** Hot metadata in Redis; Redis Sentinel for HA. Fallback to DynamoDB on miss.
+- **Bloom filter:** Eliminates DynamoDB lookups for non-existent keys — critical defense against key-scanning bots.
+- **Active-Active multi-region:** S3 CRR + DynamoDB Global Tables for global low-latency access with zero data loss on regional failure.
+
+### Pastebin vs URL Shortener — Key Differences
+
+| Aspect | URL Shortener | Pastebin |
+|--------|---------------|----------|
+| Payload | Tiny (200B URL) | Large (up to 10 MB text) |
+| Primary storage | NoSQL DB (the URL itself) | S3 + NoSQL metadata pointer |
+| CDN role | Optional (redirects only) | Critical (serves full content) |
+| Response type | HTTP 301/302 redirect | Full content response (text) |
+| Bandwidth concern | Negligible | High (TB/day at scale) |
+| Expiry complexity | Simple TTL | 3-layer TTL + cleanup worker |
+| Content security | URL validation only | XSS, PII, malware scanning |
+| Key generation | 6-char Base62 sufficient | 8-char Base62 (larger key space) |
+
+### 30-Second Perfect Interview Answer
+
+> *"Pastebin stores text blobs and serves them via a unique short key. The key insight is separating content from metadata: text is stored in S3 (cheap, durable, CDN-native), while metadata — `paste_key`, `expires_at`, `user_id`, and `s3_object_key` — lives in DynamoDB.*
+>
+> *On paste creation, the Paste Creation Service gets a pre-generated Base62 key via SPOP from a Redis key pool (filled by a Key Generation Service that monitors pool size with SCARD), uploads content to S3, then writes metadata to DynamoDB with `expires_at` set as the DynamoDB TTL attribute — so expired rows are auto-deleted without any cron job.*
+>
+> *On read, the Paste Retrieval Service checks Redis metadata cache first (Cache-Aside). On hit, it fetches content from S3 via `s3_object_key`. On miss, it queries DynamoDB, populates Redis, then fetches S3. Public pastes are cached at the CDN edge — the app server is rarely involved in reads. Viral pastes served entirely from CDN.*
+>
+> *Expiration is handled at three layers: Redis TTL, DynamoDB TTL, and S3 Lifecycle Policies. The system is deployed active-active across regions using S3 CRR and DynamoDB Global Tables, with Route53 GeoDNS for low latency globally."*
+
+### Common Follow-up Questions
+
+**Q: S3 goes down for 10 minutes. What happens?**
+- CDN edge cache continues serving recently accessed pastes (~80% hit rate for popular content).
+- New paste creates return `503` with `Retry-After`. Client retries later.
+- Nuclear option: write to a secondary S3-compatible store (GCS) in a different cloud provider.
+
+**Q: How do you handle a private paste without CDN caching?**
+- Set `Cache-Control: private, no-store` — CDN bypasses caching entirely.
+- App server validates auth token (JWT), then fetches content from S3 server-side.
+- Redis caches auth-gated metadata (not content) so only S3 fetch is needed after auth check.
+
+**Q: Storage cost is too high — 54 TB. How do you reduce it?**
+- S3 Intelligent-Tiering: auto-moves infrequently accessed objects to cheaper storage classes.
+- gzip/zstd compression before storing: typical text compresses 60–80%. 54 TB → 11–22 TB.
+- Hard expiry: delete all pastes after 1 year unless paid account. Most content is stale within a week.
+
+**Q: How do you prevent the same key being assigned to two different pastes?**
+- `SPOP` on a Redis Set is atomic — only one process gets each key, guaranteed.
+- Redis Sentinel ensures HA so the key pool is never unavailable long enough to cause issues.
+- KGS pre-generates keys ensuring no duplicates before loading into the pool.
+
+**Q: Why DynamoDB over Postgres?**
+- DynamoDB has built-in TTL — `expires_at` auto-deletes rows without any cron job. With Postgres you'd need to write and maintain a separate cleanup job for metadata.
+- DynamoDB Global Tables gives active-active multi-region replication out of the box. Postgres multi-region requires complex setups (BDR, Patroni, etc.).
+- The access patterns (lookup by `paste_key`, list by `user_id`) are a perfect fit for DynamoDB's PK + GSI model. There are no joins, no complex aggregations — no reason to pay the operational cost of a relational DB.
+- DynamoDB auto-scales write/read capacity seamlessly. At 100× traffic, DynamoDB just scales. Postgres needs manual sharding.
+
+---
+
+*End of Document — Pastebin HLD Reference Guide*
