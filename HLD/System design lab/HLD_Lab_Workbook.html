@@ -1,0 +1,1059 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EventHub - HLD Implementation Labs</title><style>
+:root{color-scheme:light;--ink:#203047;--muted:#556475;--line:#dbe2ea;--accent:#155a70;--paper:#fff;--bg:#f3f6fa}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:32px}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-size:16px;line-height:1.75}
+header{padding:30px 5vw 26px;border-bottom:1px solid var(--line);background:#132e42;color:white}header p{margin:8px 0 0;opacity:.85}header strong{font-size:24px;letter-spacing:.3px}
+.layout{display:grid;grid-template-columns:280px minmax(0,930px);gap:32px;max-width:1290px;margin:0 auto;padding:32px 24px}aside{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;padding:12px 4px}aside h2{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:0 0 12px}aside a{display:block;padding:7px 9px;color:var(--ink);text-decoration:none;font-size:13px;line-height:1.45;border-radius:5px}aside a:hover{background:#e4edf3}aside span{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:750;margin-right:7px}main{background:var(--paper);padding:44px 54px;border:1px solid var(--line);border-radius:12px;min-width:0}h1,h2,h3{line-height:1.25;color:#173e55}h1{font-size:31px;margin:38px 0 22px}h2{font-size:23px;margin-top:34px}h3{font-size:20px;margin-top:34px;border-top:1px solid #ecf0f4;padding-top:24px}p{margin:14px 0}a{color:var(--accent)}strong{font-weight:680}pre{background:#f5f7fa;border:1px solid var(--line);border-radius:7px;padding:16px 18px;overflow:auto;line-height:1.6;font-size:13px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88em;background:#f1f5f8;padding:2px 4px;border-radius:3px;overflow-wrap:anywhere}pre code{padding:0;background:none;font-size:inherit;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}td,th{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#ecf2f6}hr{border:0;border-top:2px solid var(--line);margin:48px 0}li{margin:6px 0}blockquote{border-left:4px solid var(--accent);padding-left:16px;margin-left:0;color:var(--muted)}footer{font-size:13px;color:var(--muted);padding:20px;text-align:center}
+@media(max-width:900px){.layout{display:block;padding:16px}aside{position:static;max-height:240px;margin-bottom:20px}main{padding:24px}h1{font-size:27px}}
+@media print{header,aside,footer{display:none}.layout{display:block;padding:0;max-width:none}main{border:0;padding:0}body{background:white;font-size:10pt}h1{break-before:page}h2,h3{break-after:avoid}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{color:inherit;text-decoration:none}}
+</style></head><body><header><strong>EventHub / HLD Implementation Labs</strong><p>Build. Break. Measure. Redesign. &nbsp; 21 curriculum topics + 14 pattern projects.</p></header><div class="layout"><aside><h2>Workbook navigation</h2><a href="#lab-00"><span>00</span> Lab Environment and Working Method</a>
+<a href="#lab-01"><span>01</span> Networking &amp; Protocols</a>
+<a href="#lab-02"><span>02</span> Scalability</a>
+<a href="#lab-03"><span>03</span> Consistency &amp; CAP Theorem</a>
+<a href="#lab-04"><span>04</span> Availability</a>
+<a href="#lab-05"><span>05</span> Database</a>
+<a href="#lab-06"><span>06</span> Caching</a>
+<a href="#lab-07"><span>07</span> Messaging Queues &amp; Async</a>
+<a href="#lab-08"><span>08</span> Storage Systems</a>
+<a href="#lab-09"><span>09</span> Fault Tolerance &amp; Reliability</a>
+<a href="#lab-10"><span>10</span> Reducing Latency</a>
+<a href="#lab-11"><span>11</span> Durability</a>
+<a href="#lab-12"><span>12</span> Security</a>
+<a href="#lab-13"><span>13</span> Maintainability</a>
+<a href="#lab-14"><span>14</span> API Design</a>
+<a href="#lab-15"><span>15</span> Estimation Skills</a>
+<a href="#lab-16"><span>16</span> HLD Architecture and Frameworks</a>
+<a href="#lab-17"><span>17</span> Roadmaps and System Pattern Projects</a>
+<a href="#lab-18"><span>18</span> Capstone - URL Shortener</a>
+<a href="#lab-19"><span>19</span> Capstone - Pastebin</a>
+<a href="#lab-20"><span>20</span> Capstone - BookMyShow</a>
+<a href="#lab-21"><span>21</span> Capstone - Google Drive and Dropbox</a></aside><main><h1>HLD: Learn by Building - Complete Lab Workbook</h1>
+<p><strong>Source basis:</strong> HLD Master Notes - Consolidated Index, supplied by the learner. <strong>Project:</strong> EventHub. <strong>Format:</strong> local implementation exercises plus four capstones.</p>
+<h2>Contents</h2>
+<ol start="0">
+<li>Lab Environment and Working Method</li>
+<li>Networking &amp; Protocols</li>
+<li>Scalability</li>
+<li>Consistency &amp; CAP Theorem</li>
+<li>Availability</li>
+<li>Database</li>
+<li>Caching</li>
+<li>Messaging Queues &amp; Async</li>
+<li>Storage Systems</li>
+<li>Fault Tolerance &amp; Reliability</li>
+<li>Reducing Latency</li>
+<li>Durability</li>
+<li>Security</li>
+<li>Maintainability</li>
+<li>API Design</li>
+<li>Estimation Skills</li>
+<li>HLD Architecture and Frameworks</li>
+<li>Roadmaps and System Pattern Projects</li>
+<li>Capstone - URL Shortener</li>
+<li>Capstone - Pastebin</li>
+<li>Capstone - BookMyShow</li>
+<li>Capstone - Google Drive and Dropbox</li>
+</ol>
+<hr />
+<h1 id="lab-00">00. Lab Environment and Working Method</h1>
+<h2>Scope and provenance</h2>
+<p>The supplied <strong>HLD Master Notes - Consolidated Index</strong> names 15 core concepts, Architecture &amp; Frameworks, Roadmaps &amp; Study Plans, and four case studies. It also lists 14 system-pattern families under the roadmap. The linked 21 Markdown chapters were not supplied. This workbook preserves those visible topic names and their ordering, but the projects, implementation steps, workloads, acceptance criteria, and study schedule below are newly authored exercises, not quotations or reconstructions of the unseen chapters.</p>
+<p>Every top-level topic and every named roadmap pattern has an implementation assignment. A heading such as &quot;Core Reliability Patterns&quot; does not reveal its complete contents; consequently this workbook cannot establish one-to-one coverage of every strategy inside the missing chapter. Use the coverage checklist at the end to match the visible headings. Official implementation references are identified by short source IDs, resolved in REFERENCES.md.</p>
+<h2>The project: EventHub</h2>
+<p>Build a multi-tenant event and workshop platform. Organizations publish events; users browse, book places, receive notifications, upload materials, and participate in live discussions. Later add link sharing, expiring pastes, numbered-seat reservations, and a file-sync client.</p>
+<p>Start with a modular application, not a fleet of microservices. Extract a service only when a lab asks you to test a concrete scaling or ownership boundary.</p>
+<p>Baseline request path:</p>
+<pre><code class="language-text">HTTP client -&gt; NGINX -&gt; api1 / api2 -&gt; PostgreSQL
+                                -&gt; Redis (optional, disposable cache)
+PostgreSQL outbox -&gt; publisher -&gt; RabbitMQ -&gt; notification worker
+                                            -&gt; PostgreSQL dedup + notification
+</code></pre>
+<p><strong>Implemented in this starter:</strong> HTTP API, fixture identities, tenant/owner-scoped reads, validated booking input, PostgreSQL conditional inventory update, transactional idempotency and outbox, cache-aside reads, NGINX balancing, publisher confirmations, consumer deduplication, metrics, request IDs, a load script, and a concurrency script.</p>
+<p><strong>Assignments, not completed features:</strong> production authentication, numbered-seat holds, real payments, search, file storage, replication/failover automation, full tracing, rate-limit middleware, GraphQL/gRPC servers, WebSockets, CRDT collaboration, and production disaster recovery. Some reusable algorithms are supplied in <code>src/domain.mjs</code>, but are not automatically wired into the API.</p>
+<p><strong>Safety boundary:</strong> run only on localhost or an isolated training environment with synthetic data. The included <code>lab-*</code> bearer values are public fixture identities, not secure authentication. Passwords in Compose are lab-only. Do not deploy this package publicly or use real customer records/payment credentials. Destructive exercises must use disposable lab databases or directories.</p>
+<h2>Prerequisites and startup</h2>
+<p>Use Node.js 22 or later and Docker with Compose v2. On Windows, run the shell examples in a Linux shell such as WSL2; the Node scripts themselves are cross-platform. The SQL examples use PostgreSQL 17 syntax. The default app does not require a cloud account.</p>
+<p>Choose one path:</p>
+<pre><code class="language-bash"># Zero external services: exercise domain logic and HTTP contracts.
+node --test test/*.test.mjs
+node src/demo.mjs
+# Demo listens on 127.0.0.1:3000 and loses data when restarted.
+</code></pre>
+<pre><code class="language-bash"># Main lab: real database + cache + two APIs + gateway.
+docker compose up -d --build
+docker compose exec api1 node scripts/seed.mjs
+curl http://127.0.0.1:8080/health/ready
+
+# Add the real broker, publisher, and worker when reaching Lab 07.
+docker compose --profile async up -d --build
+</code></pre>
+<p>Compose waits for the explicitly declared database/API health checks during startup. This is not a runtime failover mechanism. See [COMPOSE]. The Redis dependency is intentionally optional for serving requests.</p>
+<p>Use the checked-in dependency ranges initially. Docker's first build needs internet access. The authoring environment could not access npm and did not generate a lockfile. After a successful local <code>npm install</code>, retain <code>package-lock.json</code>, switch repeatable builds to <code>npm ci</code>, and record image digests. The listed image tags are exercise choices, not a claim that they are the newest or production-approved versions.</p>
+<h2>First successful request</h2>
+<pre><code class="language-bash">curl -i http://127.0.0.1:8080/v1/events \
+  -H 'Authorization: Bearer lab-alice'
+
+curl -i http://127.0.0.1:8080/v1/bookings \
+  -H 'Authorization: Bearer lab-alice' \
+  -H 'Content-Type: application/json' \
+  -H 'Idempotency-Key: booking-first-001' \
+  --data '{&quot;eventId&quot;:&quot;11111111-1111-4111-8111-111111111111&quot;,&quot;quantity&quot;:1}'
+</code></pre>
+<p>Repeat the booking with the same key and body. It should return the original booking ID. Reusing that key with <code>quantity:2</code> should return <code>409</code>. A successful replay is not another inventory decrement.</p>
+<p>Fixtures: <code>lab-alice</code> and <code>lab-bob</code> belong to <code>org-a</code>; <code>lab-charlie</code> belongs to <code>org-b</code>. Event <code>11111111-1111-4111-8111-111111111111</code> begins with 100 places. Event ending <code>111112</code> begins with exactly one place. Seed is non-destructive: repeating it does not reset bookings or inventory.</p>
+<h2>Workflow for every experiment</h2>
+<p>Create a branch and copy <code>evidence/TEMPLATE.md</code> to a lab-specific file. Write a hypothesis and invariant before coding. Run the naive/baseline implementation. Introduce a specific failure or workload. Make one change. Repeat the same test and record results. Commit the code, raw measurements, invariant query, and an architecture decision record.</p>
+<p>An invariant is stronger than &quot;the endpoint returned 200.&quot; Examples: no negative inventory; no duplicate effect for a replay; no cross-tenant data; every acknowledged file is retrievable; no published version points to missing bytes.</p>
+<p>No latency target in this workbook is a measured result from your hardware. Workloads and thresholds are proposed test settings. Record the observed values, including failures.</p>
+<h2>Reset and cleanup</h2>
+<p>To stop without deleting data:</p>
+<pre><code class="language-bash">docker compose --profile async down
+</code></pre>
+<p>For a <strong>complete destructive reset of this project's lab data only</strong>:</p>
+<pre><code class="language-bash">docker compose --profile async down -v
+docker compose up -d --build
+docker compose exec api1 node scripts/seed.mjs
+</code></pre>
+<p>Do not use that reset during a durability exercise: removing a volume is deliberate data deletion, not a crash. Save evidence outside container volumes.</p>
+<h2>Definition of done</h2>
+<p>A lab is complete only when you can show the implementation, reproduce the original problem, pass its correctness assertions, explain a remaining failure case, and state the extra complexity or cost introduced by the solution.</p>
+<hr />
+<h1 id="lab-01">01. Networking &amp; Protocols</h1>
+<p><strong>Project increment:</strong> expose EventHub through a gateway and implement alternate communication paths.</p>
+<p><strong>Source alignment:</strong> networking fundamentals, OSI layers, HTTP/HTTPS, TCP/UDP, DNS, load balancing/proxies, real-time communication, REST/gRPC/GraphQL, CDN/global networking. The final comparison and evidence review cover the index's pattern/interview-oriented headings.</p>
+<h3>01-A. Trace one request through the network</h3>
+<p>Start the baseline and request one event with <code>curl -v</code>. Identify the destination, port, request line, headers, status, and response body. Add a request ID to a client request and compare it with the server-generated <code>X-Request-ID</code>; the baseline deliberately generates its own ID rather than trusting arbitrary client text.</p>
+<p>Run:</p>
+<pre><code class="language-bash">curl -s -o /dev/null \
+  -H 'Authorization: Bearer lab-alice' \
+  -w 'dns=%{time_namelookup} connect=%{time_connect} first_byte=%{time_starttransfer} total=%{time_total}\n' \
+  http://127.0.0.1:8080/v1/events
+
+docker compose exec api1 node --input-type=module -e \
+  &quot;import dns from 'node:dns/promises'; console.log(await dns.lookup('postgres',{all:true}))&quot;
+</code></pre>
+<p>The curl timestamps are cumulative checkpoints, not independent durations to add. Derive phase deltas. A numeric loopback address does not exercise external DNS, so do not report it as an internet DNS measurement. The second command observes Docker service-name resolution.</p>
+<p><strong>Build:</strong> add a diagnostic page showing request ID, instance, status, payload bytes, and elapsed time. Map the actual request to application, transport, network, and local-link responsibilities. A browser capture alone cannot prove what happened at every OSI layer.</p>
+<p><strong>Pass:</strong> explain which parts of the path disappear when requesting api1 directly on port 3001 and which remain.</p>
+<h3>01-B. Add HTTPS and test certificate validation</h3>
+<p>Generate an isolated, short-lived local certificate:</p>
+<pre><code class="language-bash">mkdir -p infra/tls
+openssl req -x509 -newkey rsa:2048 -nodes \
+  -keyout infra/tls/key.pem -out infra/tls/cert.pem -days 2 \
+  -subj '/CN=eventhub.test' \
+  -addext 'subjectAltName=DNS:eventhub.test,IP:127.0.0.1'
+</code></pre>
+<p>Add a separate NGINX server listening on 443, mount the certificate/key read-only, and publish <code>127.0.0.1:8443:443</code>. Set <code>ssl_certificate</code> and <code>ssl_certificate_key</code> to their mounted paths. Preserve the original proxy locations. Do not commit the generated private key.</p>
+<p>Test with <code>curl --cacert infra/tls/cert.pem --resolve eventhub.test:8443:127.0.0.1 https://eventhub.test:8443/health/live</code>. Repeat without the trusted certificate, then with a mismatched hostname. Record validation failures. Do not solve the exercise by permanently disabling verification.</p>
+<p><strong>Pass:</strong> the trusted, matching request succeeds; the untrusted/mismatched requests fail. Explain where TLS terminates and whether the gateway-to-API hop is encrypted. HTTP semantics are specified independently of these deployment choices. [HTTP]</p>
+<h3>01-C. Implement TCP framing and a lossy UDP telemetry sender</h3>
+<p>Create <code>transport/tcp-server.mjs</code>, <code>tcp-client.mjs</code>, <code>udp-server.mjs</code>, and <code>udp-client.mjs</code> using Node's <code>net</code> and <code>dgram</code> modules. Send <code>{sequence,sentAt,value}</code> records numbered 1-100.</p>
+<p>For TCP, implement newline-delimited JSON with a receive buffer. Split one JSON record across two writes and put two records in one write. The receiver must still produce exactly 100 records. Add a maximum frame size and discard/close invalid frames.</p>
+<p>For UDP, send one record per datagram. Deliberately discard every fifth datagram in your receiver to create a reproducible application-level loss experiment. Track missing sequences and duplicates; do not imply that this artificial loss is a measured network drop rate. Then add an acknowledgement/retransmission experiment with deduplication, or explicitly choose best-effort delivery for disposable telemetry.</p>
+<p><strong>Pass:</strong> booking commands use the reliable application request path; telemetry loss does not corrupt bookings. Explain why transport delivery alone does not prove a transaction committed.</p>
+<h3>01-D. Compare gateway balancing policies</h3>
+<p>Call <code>/health/live</code> 30 times and record the <code>X-Instance</code> header. Change the upstream from its default selection to <code>least_conn</code>, then add an artificial delay to one API instance. Run a concurrent workload, not only sequential curls.</p>
+<p>Stop api1 while traffic continues. Separate requests that reached the failed node before failure detection from those routed after it. Restart api1 and observe recovery. The included <code>max_fails</code> and <code>fail_timeout</code> settings use upstream failure observations; they are not active application-health probes. [NGINX]</p>
+<p><strong>Pass:</strong> save per-instance counts, error counts, and recovery observations. Do not report &quot;zero downtime&quot; unless the measurements support that claim. Verify a sent booking POST is not blindly retried by the gateway with an unsafe policy.</p>
+<h3>01-E. Implement polling, SSE, and WebSocket versions of a live seat count</h3>
+<p>First build polling with <code>GET /v1/events/:id</code> every two seconds. Record request count and observed update delay. Next add <code>GET /v1/events/:id/stream</code> returning <code>text/event-stream</code>; send events with a monotonically increasing per-event version, heartbeat comments, and a reconnect cursor. Disable proxy buffering for that location.</p>
+<p>Finally add a WebSocket gateway with authenticated subscriptions and server-side tenant checks. Use a dedicated Redis pub/sub connection for low-latency fan-out, but persist authoritative state in PostgreSQL. On a version gap or reconnect, fetch a new snapshot; Redis pub/sub is not your durable message history.</p>
+<p>Test two clients attached to different API replicas. Disconnect one, make three bookings, reconnect, and verify it resynchronizes. Bound send buffers and disconnect/resync slow consumers rather than accumulating unlimited messages.</p>
+<p><strong>Pass:</strong> the displayed count converges after reconnection; displayed availability is never accepted as the authority for selling a seat. Explain which direction of communication each transport needs.</p>
+<h3>01-F. Expose the same catalog via three API styles</h3>
+<p>Keep <code>GET /v1/events/:id</code> as REST. Add a gRPC service with this contract:</p>
+<pre><code class="language-proto">syntax = &quot;proto3&quot;;
+package eventhub;
+service Catalog { rpc GetEvent(GetEventRequest) returns (Event); }
+message GetEventRequest { string id = 1; }
+message Event { string id = 1; string title = 2; int32 available = 3; }
+</code></pre>
+<p>Resolve tenant identity from authenticated transport metadata, not from an unrestricted <code>tenantId</code> field. Generate/load descriptors and add client deadlines using the official Node gRPC workflow. [GRPC]</p>
+<p>Create a GraphQL <code>event(id)</code> field with nested organizer details. Deliberately implement an N+1 resolver, count database calls, then batch organizer lookups using a request-scoped DataLoader. Never share its authorization-sensitive cache across users. [GRAPHQL]</p>
+<p><strong>Pass:</strong> all interfaces enforce the same ownership rules; compare bytes, errors, tooling effort, and latency on the same payload. Do not conclude one protocol is universally faster from a single local benchmark.</p>
+<h3>01-G. Build a local edge-cache experiment</h3>
+<p>Add a public, immutable event-image endpoint such as <code>/assets/&lt;contentHash&gt;.png</code>. Put a second caching proxy before the origin. Set a long cache lifetime only on those immutable public assets. Do not cache authenticated bookings or private file URLs under a public key.</p>
+<p>Warm the asset, stop the origin, and observe what the edge can still serve. Change the image content and therefore its hash. For mutable metadata, set a short lifetime and implement invalidation separately. Add simulated origin delay to show the difference between cache hit and miss paths.</p>
+<p><strong>Pass:</strong> the new URL displays the new image, private responses do not leak, and you describe this as a local edge-cache simulation rather than a deployed global CDN. Carry the measured trade-off into Lab 02.</p>
+<hr />
+<h1 id="lab-02">02. Scalability</h1>
+<p><strong>Project increment:</strong> handle increasing catalog traffic without confusing capacity with correctness.</p>
+<p><strong>Source alignment:</strong> scaling fundamentals, core techniques, CDN, patterns, and decision frameworks.</p>
+<h3>02-A. Find the first bottleneck with a repeatable workload</h3>
+<p>Install k6 for your workstation, seed the catalog, and run <code>k6 run load/catalog.js</code>. Start at 50 requests/second, then repeat at 100 and 200 using <code>RATE</code>. Use three runs per level, including one cold-cache and one warm-cache run. Keep payload, event distribution, machine resources, and duration fixed.</p>
+<pre><code class="language-bash">RATE=50 k6 run load/catalog.js
+RATE=100 k6 run load/catalog.js
+RATE=200 k6 run load/catalog.js
+</code></pre>
+<p>The script uses an arrival-rate executor. Watch <code>dropped_iterations</code>: a load generator that cannot start scheduled work has not actually delivered the requested traffic. Closed-loop concurrency tests and open arrival-rate tests answer different questions. [K6]</p>
+<p>Record client p50/p95/p99, completed throughput, error categories, CPU, memory, PostgreSQL connections, and cache behavior. Scrape each API's metrics directly on ports 3001 and 3002; scraping randomly through the gateway would mix different process counters.</p>
+<p><strong>Pass:</strong> identify a measured bottleneck, not merely the first component you recognize.</p>
+<h3>02-B. Vertical versus horizontal capacity</h3>
+<p>Stop api2 and establish a one-instance baseline. Give api1 a small CPU limit, then a larger one, using a temporary Compose override with <code>cpus</code> and <code>mem_limit</code>. Repeat the same workload. Restore the override before the next experiment.</p>
+<p>Bring api2 back and repeat. Track total database pool capacity: two pools of 10 connections are not the same configuration as one pool of 10. Add enough replicas and watch whether PostgreSQL, the gateway, or the generator becomes the limiting component.</p>
+<p><strong>Build:</strong> a table with instance count, CPU budget, pool size per instance, achieved throughput, p95, error rate, and bottleneck.</p>
+<p><strong>Pass:</strong> explain diminishing gains and any regressions. A single hot event may still serialize its inventory updates even while catalog reads scale.</p>
+<h3>02-C. Remove hidden instance-local state</h3>
+<p>Create a deliberately naive <code>POST /lab/cart/items</code> route storing carts in a process-local map. Call through the gateway, then kill one API. Observe missing or inconsistent carts.</p>
+<p>Move the cart state into an explicit shared store with TTL and ownership checks. Decide whether carts are disposable or require durable recovery; do not automatically treat Redis caching settings as adequate durability. Repeat across two replicas.</p>
+<p>For file uploads, repeat the problem with a file saved in one container's writable layer. Replace it with shared, durable storage in Lab 08 rather than hoping sticky sessions will preserve the bytes.</p>
+<p><strong>Pass:</strong> any replica can serve the cart, and losing an API process does not lose authoritative booking state. Explain what sticky sessions would and would not fix.</p>
+<h3>02-D. Implement shard routing and a resharding exercise</h3>
+<p>Use the supplied <code>shardFor()</code> rendezvous-hashing function on 10,000 synthetic organization IDs. Map keys to shards A and B, add C, and count moved keys. The accompanying unit test checks that changed assignments move to the new node rather than needlessly between old nodes.</p>
+<p>Create two isolated PostgreSQL databases with the same schema. Write a router that resolves <code>tenantId -&gt; shard</code> before acquiring a connection. Keep one tenant's booking transaction on one shard. Do not split a single inventory transaction across independent databases accidentally.</p>
+<p>To migrate a tenant, add a routing directory with <code>activeShard</code>, <code>migrationState</code>, and <code>routingVersion</code>. Copy a snapshot, replay changes, briefly fence writes for cutover, verify counts/checksums, then atomically change the directory. Route old clients through the directory rather than relying on a cached hash forever. Delete the old copy only after a verification window.</p>
+<p><strong>Failure:</strong> stop migration after the snapshot and before cutover. Repeat a booking. <strong>Pass:</strong> exactly one shard is authoritative, no accepted update is silently omitted, and rollback still has a clearly defined writer.</p>
+<h3>02-E. Protect the bottleneck rather than scaling blindly</h3>
+<p>Change traffic from uniform event reads to 90% of requests for one event. Then change it to a booking spike for a one-seat event. Compare cache hit rates, database contention, and rejected requests.</p>
+<p>Implement a bounded admission queue for the booking operation, with an explicit maximum wait and a <code>429</code> or <code>503</code> contract depending on whether the rejection is a quota or overload decision. Add jitter to retries in the test client. Never let an unbounded in-memory queue convert an overload into a memory crash.</p>
+<p><strong>Pass:</strong> admitted operations preserve inventory correctness; rejected requests fail promptly and explicitly; the queue age remains bounded. Record which component would be scaled next and why.</p>
+<hr />
+<h1 id="lab-03">03. Consistency &amp; CAP Theorem</h1>
+<p><strong>Project increment:</strong> make the booking invariant survive concurrency, lag, and partitions.</p>
+<p><strong>Source alignment:</strong> distributed-system foundations, CAP/PACELC, consistency models, replication/consensus, design decisions, and real-world patterns.</p>
+<h3>03-A. Reproduce a lost update before fixing it</h3>
+<p>Create a separate <code>inventory_lab(id integer primary key, available integer)</code> table and insert <code>(1,2)</code>. In two psql sessions, begin transactions and read <code>available</code>; both should read 2. In session A write the client-computed value 1 and commit. In session B also write 1 and commit.</p>
+<p>The final value is 1 despite two intended decrements. Record the complete schedule. This is an application read-modify-write problem; running statements inside transactions does not by itself select the required isolation or locking behavior.</p>
+<p>Replace the client-computed assignment with a conditional arithmetic update. Under PostgreSQL Read Committed, an UPDATE that waits for a concurrent updater rechecks its condition against the updated row. Use that behavior deliberately rather than relying on a stale application read. [PG-ISO]</p>
+<p><strong>Pass:</strong> explain the difference between an invariant-preserving conditional update, explicit row locking, optimistic version checks, and full serializable transactions.</p>
+<h3>03-B. Prove no overselling in the real API</h3>
+<p>Inspect <code>PgStore.book()</code> and identify every write within the same transaction. The key inventory statement is:</p>
+<pre><code class="language-sql">UPDATE events
+SET available = available - $3, version = version + 1
+WHERE tenant_id = $1 AND id = $2 AND available &gt;= $3
+RETURNING id;
+</code></pre>
+<p>The application must require one returned row before inserting the booking. The database also has an <code>available &gt;= 0</code> check as a backstop. A constraint alone does not automatically implement an entire multi-step booking protocol.</p>
+<p>Use a fresh seeded one-seat event, then run:</p>
+<pre><code class="language-bash">node scripts/race.mjs
+</code></pre>
+<p>The script launches 100 attempts with distinct idempotency keys. On a healthy, non-overloaded run, expect one <code>201</code> and the remaining attempts to report unavailability. If infrastructure timeouts occur, record them separately; they do not permit a second sale.</p>
+<p>Verify authoritative state:</p>
+<pre><code class="language-sql">SELECT e.id,e.capacity,e.available,
+       COALESCE(SUM(b.quantity) FILTER (WHERE b.status='confirmed'),0) AS sold
+FROM events e LEFT JOIN bookings b ON b.event_id=e.id AND b.tenant_id=e.tenant_id
+WHERE e.id='11111111-1111-4111-8111-111111111112'
+GROUP BY e.id;
+</code></pre>
+<p><strong>Pass:</strong> <code>sold=1</code>, <code>available=0</code>, and <code>sold+available=capacity</code>. Repeat with concurrent retries sharing one key and verify exactly one booking ID. Do not run the distinct-key and same-key cases on an already exhausted event without resetting or creating a fresh fixture.</p>
+<h3>03-C. Implement and measure read-your-writes</h3>
+<p>Add <code>event_projection(event_id primary key, version bigint, available integer, updated_at timestamptz)</code>. Update it asynchronously from committed domain events with an artificial delay. This is a read-model simulation of lag, not a physical replica.</p>
+<p>Implement three read modes: primary reads, projection reads, and <code>minimumVersion</code> reads. In the last mode, use the projection only if its version is at least the client's last observed version; otherwise wait for a bounded interval or read the primary. Do not silently return an older version while claiming read-your-writes.</p>
+<p>Deliver version 7 before version 6. Make the projection update conditional on <code>incomingVersion &gt; storedVersion</code>. Add unique event IDs for duplicate detection; a version comparison and event deduplication address related but different problems.</p>
+<p><strong>Pass:</strong> the weak read can visibly lag, the read-your-writes mode never regresses below its promised minimum, and a delayed old event does not overwrite a newer projection.</p>
+<h3>03-D. Observe a real consensus cluster under failure and partition</h3>
+<p>Use <code>infra/compose.consensus.yaml</code> to run three etcd members. It follows etcd's static container bootstrapping model. [ETCD-CONTAINER]</p>
+<pre><code class="language-bash">docker compose -f infra/compose.consensus.yaml up -d
+docker compose -f infra/compose.consensus.yaml exec e1 \
+  etcdctl --endpoints=http://e1:2379,http://e2:2379,http://e3:2379 endpoint status --write-out=table
+</code></pre>
+<p>Write a key, stop one member, and write again. Then stop a second member and repeat with a finite command timeout. Restore all members.</p>
+<p>For an actual partition experiment, disconnect e3 from the Compose network while leaving its process alive:</p>
+<pre><code class="language-bash">docker network disconnect eventhub-consensus_default \
+  &quot;$(docker compose -f infra/compose.consensus.yaml ps -q e3)&quot;
+</code></pre>
+<p>Attempt a write inside e3 against its own loopback endpoint with <code>etcdctl --command-timeout=3s --endpoints=http://127.0.0.1:2379 put demo minority</code>. Attempt another through e1/e2. Restore e3 using <code>docker network connect --alias e3 eventhub-consensus_default &lt;e3-container-id&gt;</code>.</p>
+<p>Etcd's majority side can make progress while the minority cannot commit conflicting writes. Leader transitions can still introduce temporary failures. [ETCD-FAILURES]</p>
+<p><strong>Pass:</strong> preserve the operation histories, distinguish a stopped server from a network partition, and explain the behavior of the specific read/write operation. Do not label the whole EventHub application simply &quot;CP&quot; or &quot;AP.&quot;</p>
+<h3>03-E. Build an availability-first counter and a latency/consistency comparison</h3>
+<p>Implement two independently writable page-view replicas using a grow-only counter: each node increments its own component; merge by component-wise maximum; obtain the total by summing components. Disconnect, increment both, exchange state repeatedly, and verify convergence. This counter is a deliberately mergeable data type, not a safe replacement for seat inventory.</p>
+<p>For the no-partition trade-off, add a controlled simulated remote-ack delay to a synchronous path and compare it with asynchronously propagated analytics. Mark it as a timing model, not an implementation of a new consensus protocol. Record response latency and observed staleness under both modes.</p>
+<p><strong>Pass:</strong> state which invariant makes merging acceptable for views and unacceptable for selling a unique seat. Explain CAP's partition case separately from the ordinary latency/consistency design question associated with PACELC.</p>
+<hr />
+<h1 id="lab-04">04. Availability</h1>
+<p><strong>Project increment:</strong> keep useful operations available during bounded failures and make outages measurable.</p>
+<p><strong>Source alignment:</strong> availability foundations, techniques, and patterns by system type.</p>
+<h3>04-A. Define an availability indicator before creating a dashboard</h3>
+<p>Define an eligible booking attempt and a successful service outcome. A correct &quot;sold out&quot; business response is not the same as an infrastructure failure. Measure both request-based availability and, separately, the duration of complete unavailability.</p>
+<p>Create a probe sending one request per second for five minutes. Kill api1 halfway through. Save timestamps, status categories, and instance labels. Repeat after killing the gateway: the starter has one gateway and therefore does not eliminate that failure point.</p>
+<p><strong>Pass:</strong> publish the numerator and denominator, not only a percentage. Calculate the error budget for a lab target of your choice, and label it as a target rather than a achieved service-level commitment.</p>
+<h3>04-B. Separate liveness, readiness, and optional dependencies</h3>
+<p>The baseline liveness endpoint reports the process is serving. Readiness queries PostgreSQL. Stop Redis: catalog reads should fall back to PostgreSQL; the optional cache should not mark the entire application unusable. Stop PostgreSQL: readiness and authoritative writes should fail.</p>
+<p>Add a draining state for deployment: stop accepting new work, mark the instance unready to a health-aware router, let bounded in-flight work finish, then exit. The provided NGINX setup does not actively poll readiness; implement an orchestrator/proxy integration or explicitly remove the instance from routing before stopping it.</p>
+<p><strong>Pass:</strong> optional recommendations/notifications can degrade without falsely confirming bookings; a liveness policy does not repeatedly restart all instances during a database outage.</p>
+<h3>04-C. Add a physical standby and perform a fenced manual failover</h3>
+<p>Use the replication setup recipe in <code>infra/REPLICATION.md</code>. Create a replication role on the lab primary, permit its replication connection in the lab-only <code>pg_hba.conf</code>, and initialize a standby with <code>pg_basebackup -R</code>. Query <code>pg_is_in_recovery()</code> and compare WAL positions.</p>
+<p>Pause replay with <code>pg_wal_replay_pause()</code>, make a booking on the primary, and demonstrate a stale read from the standby. Resume replay and measure catch-up. Do not interpret a healthy TCP connection as proof the replica is current.</p>
+<p>For failover, stop/fence the old primary before promoting the standby with <code>pg_promote()</code>. Repoint writers, run the booking invariant query, and compare committed records against your client history. Record any data loss under asynchronous replication. Do not bring the old primary back as another writer; rebuilding/rejoining it is a separate operation.</p>
+<p><strong>Pass:</strong> a single writer is enforced throughout, availability loss is measured, and the result includes an observed recovery-point gap rather than assuming replication means zero loss. See [PG-REPLICATION].</p>
+<h3>04-D. Deploy a backwards-compatible change without losing service</h3>
+<p>Add a nullable <code>attendee_note</code> column, deploy code that tolerates it being absent/null, then deploy writers that use it. Run continuous reads and bookings while replacing one API instance at a time. Roll the code back while leaving the additive column in place.</p>
+<p>Next deliberately rename or remove a column while old code is still running on one instance in a disposable branch. Observe failures. Restore the schema and rewrite the migration as expand, transition, and later contract.</p>
+<p><strong>Pass:</strong> the compatible rollout preserves service and invariants; the incompatible experiment is captured as a failure case. Keep availability evidence separate from the durability proof in Lab 11.</p>
+<hr />
+<h1 id="lab-05">05. Database</h1>
+<p><strong>Project increment:</strong> make storage choices from access patterns, query plans, and transaction boundaries.</p>
+<p><strong>Source alignment:</strong> SQL/NoSQL foundations, replication/HA, partitioning/sharding, indexing, performance, scaling, and design patterns.</p>
+<h3>05-A. Model constraints before adding indexes</h3>
+<p>Inspect <code>db/001_init.sql</code>. Identify primary keys, the composite tenant/event foreign key, checks, and ownership indexes. Add organizations and users, then replace the fixture-only identifiers with foreign keys while keeping a clean migration path.</p>
+<p>Write tests that attempt a negative quantity, a booking for another tenant's event, an orphaned event reference, and a duplicate idempotency key. Assert database and API behavior. Do not assume UUIDs are an authorization boundary.</p>
+<p>Create a requirement that one organizer can assign many instructors to many events; implement a join table rather than comma-separated IDs. Then add optional display-only event metadata as JSONB and specify which fields are indexed or validated.</p>
+<p><strong>Pass:</strong> show which invariants are protected in the database, which in the application, and why both are needed.</p>
+<h3>05-B. Build a million-row query-tuning experiment</h3>
+<p>Create a disposable workload table instead of filling the real booking table with invalid historical data:</p>
+<pre><code class="language-sql">CREATE TABLE workload_orders AS
+SELECT g::bigint AS id, (g%10)::integer AS tenant_id,
+       (g%1000)::integer AS user_id,
+       timestamptz '2026-01-01 00:00:00+00' + g*interval '1 second' AS created_at,
+       repeat('x',100) AS payload
+FROM generate_series(1,1000000) g;
+ANALYZE workload_orders;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT id,created_at FROM workload_orders
+WHERE tenant_id=7 AND user_id=7
+ORDER BY created_at DESC,id DESC LIMIT 20;
+
+CREATE INDEX workload_owner_time
+ON workload_orders(tenant_id,user_id,created_at DESC,id DESC);
+</code></pre>
+<p>Repeat the plan and workload after adding the index. Compare rows visited, buffers, sort operations, index size, and write cost. Use the same data and parameters. Do not expect an index scan to be optimal for every query; test a query that returns a large fraction of the table too. [PG-EXPLAIN]</p>
+<p><strong>Pass:</strong> justify the index column order with the actual filter/sort pattern and demonstrate its cost on insert/update throughput.</p>
+<h3>05-C. Compare relational, key-value, and document-shaped access</h3>
+<p>Implement event lookup three ways: normalized PostgreSQL rows, a Redis key containing a disposable JSON projection, and a document representation containing an event with its display metadata. For the third path, first use PostgreSQL JSONB, then optionally repeat in a local MongoDB instance to compare an actual document database. JSONB support alone does not turn PostgreSQL into a separate NoSQL system.</p>
+<p>Define workloads before comparing: point lookup, filter by organizer and date, update one embedded field, and join to an instructor. Create appropriate indexes for each. Measure duplication and the work required to update an instructor name appearing in many materialized documents.</p>
+<p><strong>Failure:</strong> interrupt the projection update halfway through. <strong>Pass:</strong> the authoritative data remains intact, stale projections can be rebuilt, and you choose storage per access pattern rather than declaring SQL or NoSQL universally superior.</p>
+<h3>05-D. Partition time-series data and distinguish partitioning from sharding</h3>
+<p>Create a telemetry table with monthly partitions:</p>
+<pre><code class="language-sql">CREATE TABLE telemetry (
+ occurred_at timestamptz NOT NULL, event_id uuid NOT NULL,
+ tenant_id text NOT NULL, value double precision NOT NULL,
+ PRIMARY KEY(occurred_at,event_id)
+) PARTITION BY RANGE(occurred_at);
+CREATE TABLE telemetry_2026_01 PARTITION OF telemetry
+FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+CREATE TABLE telemetry_2026_02 PARTITION OF telemetry
+FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
+</code></pre>
+<p>Seed both months. Compare a January-only query with one missing a time predicate. Inspect partition pruning in EXPLAIN. PostgreSQL's partition pruning uses partition bounds; an index and a partition solve different parts of the access problem. [PG-PARTITION]</p>
+<p>Test an out-of-range insert, add a controlled default/new-month strategy, and practice retiring a partition. Explain why a primary key on only <code>event_id</code> cannot simply be assumed globally enforced by this partitioned-table definition.</p>
+<p><strong>Pass:</strong> name the difference between partitions on one server and independent database shards from Lab 02. Show a retention operation without deleting unrelated months.</p>
+<h3>05-E. Tune pools, replicas, and transaction duration together</h3>
+<p>Compare API pool sizes 2, 10, and 30 while holding API count and workload constant. Log acquisition wait separately from query execution. Create a slow transaction holding an inventory row lock; inspect waiting sessions and set a finite lock timeout.</p>
+<p>Route catalog reads to the standby from Lab 04, but keep booking decisions on the primary. Test replica lag and read-your-writes. Add query cancellation/deadline handling and release clients in <code>finally</code> blocks after commit/rollback.</p>
+<p><strong>Pass:</strong> no leaked connections, no assumption that more connections always mean more throughput, and no correctness decision taken from a lagging replica.</p>
+<hr />
+<h1 id="lab-06">06. Caching</h1>
+<p><strong>Project increment:</strong> accelerate catalog reads while making cache failure and staleness visible.</p>
+<p><strong>Source alignment:</strong> fundamentals, strategies, eviction, distributed caching, invalidation, common problems, and system patterns.</p>
+<h3>06-A. Instrument cache-aside instead of guessing its value</h3>
+<p>Read an event twice and compare <code>X-Cache</code>. Add counters for hit, miss, cache timeout, and database fallback. Run the catalog load script with <code>CACHE_ENABLED=false</code>, then with the cache enabled. Keep the data and workload identical.</p>
+<p>Inspect the baseline path: check cache, fetch the authoritative row on miss, attempt a cache fill, and return. Redis failures are caught because it is optional. The HTTP response uses <code>no-store</code>; this application cache is distinct from browser/CDN caching.</p>
+<p><strong>Build:</strong> record hit ratio and database QPS together. A high hit ratio for one tiny hot object is not evidence that a large mixed workload will fit in memory.</p>
+<p><strong>Pass:</strong> disabling Redis does not invent successful bookings or lose authoritative data; the fallback's increased database load is visible.</p>
+<h3>06-B. Implement four strategy variants with explicit failure semantics</h3>
+<p>Create interchangeable <code>CatalogRepository</code> wrappers. In <strong>cache-aside</strong>, callers explicitly fill after misses. In <strong>read-through</strong>, the wrapper owns the loading logic, so the service does not know how fills occur. Compare code ownership as well as runtime behavior.</p>
+<p>For <strong>write-through</strong>, have the wrapper synchronously write the database and then refresh Redis. Inject a Redis failure after the database commit. Decide whether to return the durable write result and invalidate/retry cache maintenance, or return an explicitly ambiguous response. Do not claim the two independent stores form one atomic transaction.</p>
+<p>For <strong>write-behind</strong>, use only disposable page-view aggregation: accept into a bounded buffer, flush batches periodically, and kill the process before a flush. Measure loss. Then replace the volatile buffer with a durable queue to change the acknowledgement boundary. Do not use the naive volatile variant for inventory or payments.</p>
+<p><strong>Pass:</strong> produce a strategy/failure table showing who owns loading, when success is acknowledged, what can be lost, and how repair works.</p>
+<h3>06-C. Reproduce the stale-fill invalidation race</h3>
+<p>Add a deterministic test hook immediately after the database read and before the cache set. Start reader A and pause it there. Writer B changes the event and deletes the cache key. Resume A: it now fills the cache with the older row.</p>
+<p>This demonstrates why delete-after-write alone is not a universal consistency proof. A five-second TTL limits retention after a fill, but an arbitrarily delayed stale fill does not establish a strict five-second freshness bound relative to the underlying update.</p>
+<p>Implement one explicit remedy and test its assumptions: version-aware immutable cache keys plus a coherent version pointer; a generation/fencing token checked atomically before fill; or primary reads for operations requiring strict freshness. Keep booking decisions on PostgreSQL regardless.</p>
+<p><strong>Pass:</strong> the controlled interleaving no longer returns a version that violates the promised read contract. Document invalidation outages and delayed messages as remaining cases.</p>
+<h3>06-D. Collapse stampedes and handle negative-cache invalidation</h3>
+<p>Delete one hot cache entry and send 100 simultaneous reads. Count database fetches. Add an in-process map of in-flight load promises so concurrent local requests await the same fetch. Remove the promise in <code>finally</code> so a failed load does not poison the key forever.</p>
+<p>Repeat across both API replicas. For cross-process coordination, experiment with a bounded lease acquired using <code>SET key token NX PX ttl</code>; release only if the token still matches. Use a unique token and a compare-and-delete Lua script. This is cache-fill coordination, not an authoritative seat lock. Redis's lock documentation explicitly discusses the safety limits of failover-based and expiring leases. [REDIS-LOCK]</p>
+<p>Cache an absent object briefly, create it, and verify creation invalidates the negative cache. Apply TTL jitter to many keys expiring at once. Test hot-key expiry separately from a mass expiry wave.</p>
+<p><strong>Pass:</strong> measure collapsed work, specify behavior when the loader dies, and show a newly created object is not hidden indefinitely by a stale negative entry.</p>
+<h3>06-E. Compare eviction policies and isolate authoritative state</h3>
+<p>Use only the dedicated lab Redis. Populate more data than the configured cache budget. Compare <code>allkeys-lru</code>, <code>allkeys-lfu</code>, and <code>noeviction</code> under uniform and skewed reads. Inspect <code>INFO stats</code> and <code>INFO memory</code>, including evictions and rejected writes.</p>
+<p>Redis exposes policy choices with different eviction behavior; its LRU/LFU implementations are approximations rather than a perfect record of every access. [REDIS-EVICT]</p>
+<p>Now store a simulated rate-limit key in the same evicting instance and demonstrate why eviction can weaken quota enforcement. Move security/coordination state to a separately configured store with a documented failure policy. Do not simply add &quot;important&quot; key prefixes to an all-keys eviction policy.</p>
+<p><strong>Pass:</strong> cache size is based on measured bytes, not just object count; eviction never removes the only copy of a booking.</p>
+<h3>06-F. Add a two-level cache and test invalidation loss</h3>
+<p>Add a small per-process L1 cache before Redis L2. Include value version and expiry metadata. Broadcast invalidations, then disconnect one subscriber during an event change. Reconnect and observe whether it serves stale L1 data.</p>
+<p>Implement bounded L1 lifetime and a resynchronization mechanism. Define which read contracts allow that bound. Compare L1 hit latency against the added invalidation, memory, and observability complexity.</p>
+<p><strong>Pass:</strong> state a precise freshness policy and its failure assumptions; never present best-effort pub/sub invalidation as guaranteed delivery.</p>
+<hr />
+<h1 id="lab-07">07. Messaging Queues &amp; Async</h1>
+<p><strong>Project increment:</strong> deliver booking notifications without making a database commit depend on a healthy notification provider.</p>
+<p><strong>Source alignment:</strong> messaging systems, delivery guarantees, idempotency, async patterns, scaling, common failures, and real-world architectures.</p>
+<h3>07-A. Remove notification delivery from the synchronous transaction</h3>
+<p>Create a naive branch that writes a booking and then calls a fake email endpoint before returning. Add two seconds of delay and an intermittent error. Record booking latency and client retries.</p>
+<p>Return to the baseline outbox design and start the async profile:</p>
+<pre><code class="language-bash">docker compose --profile async up -d --build
+</code></pre>
+<p>Create a booking and poll <code>/v1/notifications</code>. The starter records a simulated notification in PostgreSQL; it does not send an external email. Its transactional guarantee ends at that database effect.</p>
+<p><strong>Pass:</strong> broker/worker downtime delays notifications but does not erase the committed booking. The pending outbox is visible and eventually drains after recovery.</p>
+<h3>07-B. Inspect the transactional outbox and exercise both crash windows</h3>
+<p><code>PgStore.book()</code> inserts inventory changes, the booking, an idempotency response, and an outbox event within one database transaction. <code>publisher.mjs</code> reads pending rows with <code>FOR UPDATE SKIP LOCKED</code>, publishes one durable message, waits for broker confirmation, and only then marks the row published.</p>
+<p>First stop the publisher before creating a booking. Verify a pending row exists and is later delivered. Next set <code>PUBLISH_PAUSE_AFTER_CONFIRM_MS=10000</code>, recreate the publisher, create a fresh booking, and kill the publisher during that pause. Restart normally. The message may be delivered again because publish and database marking are separate transactions.</p>
+<pre><code class="language-bash">PUBLISH_PAUSE_AFTER_CONFIRM_MS=10000 \
+  docker compose --profile async up -d --force-recreate publisher
+# Create a fresh booking, then kill during the configured pause.
+docker compose kill -s KILL publisher
+PUBLISH_PAUSE_AFTER_CONFIRM_MS=0 \
+  docker compose --profile async up -d --force-recreate publisher
+</code></pre>
+<p><strong>Pass:</strong> every committed outbox event remains eligible until acknowledged publication, and duplicate delivery does not duplicate the effect. Broker publisher confirmations and consumer acknowledgements cover different stages; neither alone proves the other stage occurred. [RABBIT-CONFIRMS]</p>
+<h3>07-C. Make the consumer effect duplicate-safe</h3>
+<p>Inspect <code>worker.mjs</code>. It inserts the event ID into <code>processed_events</code> and creates the notification in the same transaction. If the ID already exists, it skips the effect. It acknowledges only after that transaction commits.</p>
+<p>Set <code>WORKER_PAUSE_AFTER_COMMIT_MS=10000</code> and kill the worker after its database commit but before the broker acknowledgement. Restart without the pause. Query notifications by the event ID and require one row.</p>
+<p>Repeat by deliberately resetting one outbox row's <code>published_at</code> to NULL in the isolated lab and allowing republishing. Use the same event ID, not a new ID for the retry.</p>
+<p><strong>Pass:</strong> one simulated effect per event ID. State the scope accurately: at-least-once delivery plus a transactional idempotent consumer, not magical end-to-end exactly-once delivery. For a real external email/payment provider, use the provider's idempotency support or reconcile ambiguous outcomes; a local dedup row cannot atomically commit a remote action.</p>
+<h3>07-D. Add bounded retries, a dead-letter queue, and a repair path</h3>
+<p>The starter sends malformed/unsupported events to a dead-letter route and exits on transient database errors instead of hot-looping immediate requeues. Extend it with attempt count, <code>nextAttemptAt</code>, error classification, exponential backoff, jitter, and a maximum attempt budget.</p>
+<p>Create a poison message, a temporarily unavailable database, and a permanently invalid recipient. Verify each follows the intended policy. Add an authenticated redrive command that preserves event identity, records who requested repair, and does not bypass payload validation.</p>
+<p>The starter's single-node durable classic queue and simple DLX are teaching defaults, not a complete highly available broker or guaranteed dead-letter delivery topology. In an advanced branch, configure replicated quorum queues and verify their documented dead-letter behavior before making stronger guarantees.</p>
+<p><strong>Pass:</strong> a bad message does not block all good messages, retry traffic is bounded, and operators can inspect and safely redrive failures.</p>
+<h3>07-E. Add ordering and backpressure deliberately</h3>
+<p>Create booking lifecycle events with <code>aggregateId</code>, <code>aggregateVersion</code>, and <code>eventId</code>. Deliver versions 3, 1, 2, 2 to the consumer. Decide whether to buffer gaps, fetch a fresh state snapshot, or enforce per-key ordering in the transport. Merely having a queue does not define the business ordering contract.</p>
+<p>Run one, two, and four workers with different prefetch values. Measure throughput, oldest-message age, delivery duplicates, and database load. Use a slow fake dependency to show why more concurrent consumers can worsen overload.</p>
+<p><strong>Pass:</strong> the final lifecycle state is valid despite duplicates and tested reorderings, and consumption concurrency cannot grow without bound.</p>
+<h3>07-F. Compare competing consumers, fan-out, and replayable logs</h3>
+<p>Add separate notification and analytics subscribers. Give each its own queue bound to an event exchange so both receive the event; do not put both roles on one competing-consumer queue and expect both to receive every message.</p>
+<p>For replay, retain an append-only event archive or introduce a log-oriented broker in a separate extension. Rebuild analytics into an empty table while live events continue. Checkpoint progress without losing events arriving during the rebuild.</p>
+<p><strong>Pass:</strong> explain the difference between distributing work to one worker, broadcasting to independent subscribers, and retaining history for replay. Keep event sourcing distinct from using an outbox: the baseline booking tables, not the outbox, remain the source of truth.</p>
+<hr />
+<h1 id="lab-08">08. Storage Systems</h1>
+<p><strong>Project increment:</strong> add large event materials and resumable downloads without storing every byte in the API process.</p>
+<p><strong>Source alignment:</strong> block/file/object storage, CDN/media delivery, large files, distributed storage concepts, decision frameworks, and system patterns.</p>
+<h3>08-A. Implement a storage interface and expose the failure boundaries</h3>
+<p>Define <code>put(key, stream)</code>, <code>get(key)</code>, <code>head(key)</code>, and <code>delete(key)</code>. Build a local filesystem adapter using generated, server-controlled keys under one configured root directory. Reject user-selected paths, <code>..</code>, and absolute path traversal. Separate display filename from physical key.</p>
+<p>Store file metadata in PostgreSQL: tenant, owner, object key, size, checksum, content type, lifecycle status, and version. Do not store a path supplied by the browser as trusted storage identity.</p>
+<p>Compare a container writable layer, a named volume, a shared filesystem mount, and an object-store API in an architecture decision record. A local directory-backed adapter is not an implementation of a distributed object store; a same-host shared mount is not evidence about NFS behavior across machines.</p>
+<p><strong>Pass:</strong> restarting an API cannot lose metadata; the persistence boundary for the bytes is explicitly identified and tested.</p>
+<h3>08-B. Stream uploads and validate ownership, size, and checksums</h3>
+<p>Implement <code>POST /v1/files/initiate</code> returning a server-generated upload ID and an allowed maximum size. Add a streaming upload endpoint. Use <code>stream.pipeline()</code> and a running hash rather than concatenating the full file into RAM. Enforce an actual byte limit even when Content-Length is missing or false.</p>
+<p>Write to a temporary object, verify its length and checksum, then publish immutable bytes and commit metadata to <code>available</code>. If metadata commit fails after object creation, retain a recoverable orphan, not a published metadata pointer to missing bytes. Use an orphan-cleanup grace period so in-progress uploads are not deleted.</p>
+<p>Test 1 MiB, 50 MiB, and a larger file suitable for your disk. Record API memory usage. Test a wrong checksum, early disconnect, and a user trying another user's upload ID.</p>
+<p><strong>Pass:</strong> failed or unauthorized uploads never become readable committed files; peak API memory does not scale with whole-file size.</p>
+<h3>08-C. Implement multipart/resumable upload as a state machine</h3>
+<p>Add these tables and endpoints:</p>
+<pre><code class="language-text">upload_sessions(id,tenant_id,user_id,expected_size,expected_hash,status,expires_at)
+upload_parts(upload_id,part_number,size,checksum,object_key)
+PRIMARY KEY(upload_id,part_number)
+POST /v1/uploads
+PUT  /v1/uploads/:id/parts/:partNumber
+GET  /v1/uploads/:id/parts
+POST /v1/uploads/:id/complete
+DELETE /v1/uploads/:id
+</code></pre>
+<p>Divide a file into fixed-size parts. Upload out of order; use bounded parallelism. Retry the same part with the same bytes and require an idempotent outcome; reject a conflicting overwrite after a part is finalized. Complete only after checking the exact ordered manifest, total size, and a defined full-file checksum. Serialize concurrent completion calls and return the original completed result.</p>
+<p>Interrupt halfway, list completed parts, and resume only missing parts. Expire abandoned sessions and delete their unreferenced bytes after the grace period.</p>
+<p>For a real S3 extension, map initiate/upload/complete/abort onto the provider's multipart operations and use provider-supported checksums. Do not assume a multipart ETag is the checksum of the entire file. S3 allows independent part uploads and reuploading failed parts. [S3-MULTIPART]</p>
+<p><strong>Pass:</strong> byte-for-byte identical final download, safe repeated completion, no visible partial file, and no tenant escape.</p>
+<h3>08-D. Add authenticated downloads, ranges, and safe edge caching</h3>
+<p>Authorize access before issuing a download ticket. Scope the ticket to one object/version and a short expiry; never accept an arbitrary object key from a caller without authorization.</p>
+<p>Implement byte-range responses in the local adapter and test the first, middle, last, and invalid ranges. Verify <code>Content-Range</code>, body length, and a reconstructed whole-file checksum. Rate-limit small-range abuse rather than allowing unlimited expensive tiny reads. HTTP range semantics are part of the HTTP contract. [HTTP]</p>
+<p>Cache only public immutable content at the edge. A signed download URL can remain usable until it expires; immediate revocation requires an additional design, not merely deleting a sharing row in your app.</p>
+<p><strong>Pass:</strong> a resumed download is identical, private content does not become globally cached, and the revocation guarantee is stated honestly.</p>
+<h3>08-E. Simulate replication, corruption detection, and repair</h3>
+<p>Create two separate local storage roots to model copies. Store checksums, corrupt one copy of a synthetic file, and verify reads detect the mismatch. Repair from the verified copy, then corrupt both and prove detection does not imply recoverability.</p>
+<p>Add a background integrity scanner with a bounded I/O budget. Record which metadata points to missing objects, which objects have no references, and which copies fail verification. Treat two directories on one disk as a functional simulation only, not independent failure domains.</p>
+<p><strong>Pass:</strong> the system never silently serves known-corrupt bytes; it can repair only when an intact authorized copy exists. Carry that distinction into the durability lab.</p>
+<hr />
+<h1 id="lab-09">09. Fault Tolerance &amp; Reliability</h1>
+<p><strong>Project increment:</strong> tolerate slow and failing dependencies without amplifying an outage.</p>
+<p><strong>Source alignment:</strong> reliability foundations, core patterns, engineering techniques, and system playbooks.</p>
+<h3>09-A. Build a deterministic failing dependency</h3>
+<p>Add a local <code>fake-provider</code> service with configurable delay, failure probability, and a mode that performs its effect then drops the response. Record calls using a stable operation ID. Protect its configuration endpoint so it is not exposed outside the lab.</p>
+<p>Call it from a deliberately naive notification or mock-payment path. Run load while changing delay from 20 ms to 2 seconds. Observe active calls, queue length, and total latency.</p>
+<p><strong>Pass:</strong> you can reproduce timeout, explicit failure, and ambiguous completion as three different outcomes.</p>
+<h3>09-B. Implement deadline-aware, bounded retries</h3>
+<p>Allocate an overall operation deadline, a maximum attempt count, and a per-attempt budget. Propagate cancellation with <code>AbortController</code> to outgoing HTTP calls. Do not confuse Node's inbound request-body timeout with a complete end-to-end handler deadline.</p>
+<p>Retry only classified transient failures. Reuse the same idempotency key for a write retry. For exponential full jitter, choose delay uniformly between zero and <code>min(cap, base * 2**attempt)</code>, and stop if there is insufficient deadline remaining. Retry at one chosen layer rather than independently multiplying attempts in gateway, API, SDK, and worker.</p>
+<p>The dependency may have committed even when the caller timed out. Use the fake provider's drop-after-effect mode to verify that a retry with a new key duplicates an effect while stable-key reconciliation does not. Bounded retries and jitter are meant to avoid turning partial failure into synchronized overload. [AWS-RETRY]</p>
+<p><strong>Pass:</strong> upper bounds exist for attempts, elapsed time, and in-flight work; permanent validation errors are not retried.</p>
+<h3>09-C. Wire in the supplied circuit breaker</h3>
+<p>Read <code>CircuitBreaker</code> in <code>src/domain.mjs</code> and its tests. Attach one breaker per dependency/operation class, not one global breaker covering unrelated functionality. Add counters for open rejection, attempted calls, failures, and recovery probes.</p>
+<p>Set the provider to fail continuously. Verify the breaker opens after the configured threshold, rejects without calling the provider, admits a single half-open probe after the wait, and closes only after success. Test a slow old success arriving after the breaker opened; the supplied implementation uses an epoch to prevent that stale completion from incorrectly closing it.</p>
+<p><strong>Pass:</strong> optional features degrade predictably and do not consume every booking connection. Discuss tuning: a circuit is a policy with false positives/negatives, not proof the dependency is dead.</p>
+<h3>09-D. Add bulkheads, load shedding, and a safe fallback</h3>
+<p>Give reports/exports a separate concurrency semaphore or connection pool from interactive booking operations. Submit ten slow report jobs while booking traffic continues. Then remove the separation in a controlled branch and compare.</p>
+<p>Limit waiting work; return an explicit overload response before memory is exhausted. For event recommendations, return an empty/popular list with a degraded flag. For inventory, return an error rather than cached &quot;success.&quot;</p>
+<p><strong>Pass:</strong> report overload does not consume all booking capacity, and every fallback preserves the relevant business invariant.</p>
+<h3>09-E. Run a failure-injection matrix and write a runbook</h3>
+<p>In the isolated stack, separately stop Redis, stop the broker, kill a worker, pause PostgreSQL, kill api1, and stop the gateway. Restore the system between experiments. Apply a fixed workload and save failure onset, detection, recovery, lost/duplicate effects, and queue growth.</p>
+<p>A process kill does not simulate all forms of packet loss or an entire region outage. For network-specific tests, add a TCP fault proxy and target only lab connections. Keep duration and blast radius bounded.</p>
+<p><strong>Pass:</strong> produce a runbook with a symptom, confirming signal, safe mitigation, rollback, and an invariant query. Include at least one case where the correct action is to reject work rather than pretend availability.</p>
+<hr />
+<h1 id="lab-10">10. Reducing Latency</h1>
+<p><strong>Project increment:</strong> improve a specific slow request using evidence, not a collection of optimizations.</p>
+<p><strong>Source alignment:</strong> latency fundamentals, core/advanced techniques, trade-offs, decision framework, and anti-patterns.</p>
+<h3>10-A. Measure the critical path and tail</h3>
+<p>Create <code>GET /v1/dashboard</code> that fetches an event, organizer, recommendations, and recent bookings. Add timestamps/spans around each call and around connection-pool acquisition. Build a baseline using sequential calls.</p>
+<p>Report the latency distribution and errors, not only the average. Add a rare slow response to one dependency and observe its effect on p99. Do not add service p95 values or average instance p95 values and call the result end-to-end p95.</p>
+<p><strong>Pass:</strong> identify which work lies on the response's critical path, which is parallelizable, and which is optional.</p>
+<h3>10-B. Parallelize independent work and remove N+1 queries</h3>
+<p>Fetch independent dashboard components concurrently with separate deadlines. Return required data only when its contract is met; make optional recommendation failure explicit. Add a concurrency limit rather than blindly launching one promise per row.</p>
+<p>Create 50 event cards with organizer names. Compare 51 queries with a join/batched lookup. Use a per-request DataLoader when implementing the GraphQL variant; preserve result ordering relative to input keys. [GRAPHQL]</p>
+<p><strong>Pass:</strong> lower database round trips without changing authorization or response semantics. Measure whether parallelism improved latency at the cost of greater instantaneous dependency load.</p>
+<h3>10-C. Optimize payload and connection work</h3>
+<p>Compare <code>SELECT *</code> with selecting only the fields rendered by the card. Add response compression for sufficiently large compressible payloads. Test a small JSON body, a large JSON body, and an already compressed image; measure bytes and CPU instead of assuming compression always helps.</p>
+<p>Reuse outbound connections and database pools. Compare a new connection per request with reuse. Keep warm-cache and cold-start experiments separate. Move nonessential click analytics into the outbox path rather than blocking the user response.</p>
+<p><strong>Pass:</strong> your evidence identifies whether time was saved in transfer, connection establishment, query execution, or waiting.</p>
+<h3>10-D. Experiment with hedged reads without duplicating writes</h3>
+<p>Create two read-only replicas of a fake slow catalog endpoint with different tail behavior. Send the first read; only after a measured delay launch a second read if the first remains incomplete. Return the first acceptable result and cancel the other where possible.</p>
+<p>Add a strict hedge budget so the experiment cannot double all traffic during overload. Compare p99 improvement, total backend requests, and divergence between replicas. Define the acceptable version before choosing the first response.</p>
+<p><strong>Pass:</strong> no write operation is hedged, extra traffic is bounded, and a faster stale reply is not mislabeled as meeting a stronger consistency contract.</p>
+<h3>10-E. Create and enforce a latency budget</h3>
+<p>Choose a lab objective, for example a 500 ms p95 for a stated local workload. Allocate tentative budgets to gateway, API work, pool wait, database, optional services, and transfer. These are design allocations, not guarantees that independent percentile values add.</p>
+<p>Run the workload at 50%, 80%, and above the measured sustainable capacity. Observe queueing and compare latency with and without admission control. Document the point where a bounded rejection is preferable to an unbounded wait.</p>
+<p><strong>Pass:</strong> at least one optimization is accepted and one rejected based on measured benefit, resource cost, correctness, and operational complexity.</p>
+<hr />
+<h1 id="lab-11">11. Durability</h1>
+<p><strong>Project increment:</strong> recover acknowledged state and files from crashes and mistakes.</p>
+<p><strong>Source alignment:</strong> durability foundations/techniques, backup/recovery, distributed durability, decision framework, and anti-patterns.</p>
+<h3>11-A. Define what &quot;acknowledged&quot; means and test process crashes</h3>
+<p>Write a client-side append-only history of successful booking responses, including operation key, booking ID, and observed response time. Kill PostgreSQL after a stream of successes, without removing its volume. Restart and check every acknowledged booking ID against the database.</p>
+<p>Compare the results with database durability settings such as <code>synchronous_commit</code> only in an isolated disposable instance. A successful process-crash test does not prove survival of a power loss, faulty disk, or loss of the entire host.</p>
+<p><strong>Pass:</strong> report exactly which fault was injected and which acknowledged records survived. Do not confuse an unacknowledged request that committed with acknowledged data loss; reconcile ambiguous outcomes by key.</p>
+<h3>11-B. Take a backup and prove restoration into a different database</h3>
+<p>Create a backup, store it outside the database volume, and restore to a distinct lab database:</p>
+<pre><code class="language-bash">mkdir -p backups
+docker compose exec -T postgres pg_dump -U lab -d eventhub -Fc &gt; backups/eventhub.dump
+docker compose exec postgres createdb -U lab restore_check
+docker compose exec -T postgres pg_restore -U lab -d restore_check --no-owner &lt; backups/eventhub.dump
+</code></pre>
+<p><code>createdb</code> is intended for a new empty restore target; choose another name if it already exists. Compare row counts, sampled record contents, inventory conservation, foreign keys, and outbox state. Do not point a restored outbox at real providers: its pending or replayed events can trigger effects again.</p>
+<p>Delete a synthetic table in the original lab database only after the backup is verified. Restore the required data into a recovery environment and document the cutover procedure.</p>
+<p><strong>Pass:</strong> a usable restoration, measured recovery time, and a clear statement of how much newer data the backup lacks. &quot;Backup job succeeded&quot; alone is not enough.</p>
+<h3>11-C. Perform point-in-time recovery with a base backup and WAL</h3>
+<p>This is an advanced PostgreSQL exercise, distinct from <code>pg_dump</code>. Configure WAL archiving to a separate lab directory, verify archive success, take a physical base backup, and record a restore target immediately before a deliberate destructive transaction.</p>
+<p>Restore the physical backup into a separate data directory. Configure <code>restore_command</code>, create <code>recovery.signal</code>, and set a recovery target that stops before the destructive commit. Start the recovery instance on a different port. Verify the pre-error row exists and legitimate earlier transactions are present.</p>
+<p>PostgreSQL PITR combines a physical base backup with the relevant WAL history; a logical dump is not a substitute for that process. Follow the version-matched recovery instructions for filenames and target semantics. [PG-PITR]</p>
+<p><strong>Pass:</strong> restore the desired point, record the recovery timeline and measured RPO/RTO, and prove the archive contains every required segment. Keep backup and recovery credentials separate from ordinary application credentials.</p>
+<h3>11-D. Test the acknowledgement boundary for files and messages</h3>
+<p>For the local file adapter, distinguish &quot;bytes copied to a process buffer,&quot; &quot;written to the operating system,&quot; and the durability behavior of the chosen storage backend. Publish metadata only after the configured byte-durability boundary. On a local filesystem, practice file/directory synchronization where supported; do not assume a rename alone proves power-loss durability.</p>
+<p>For the broker, compare sending without confirmations to confirmed publication. Kill the publisher and broker at controlled points and reconcile against the outbox and consumer tables. A single-node broker can still lose availability with its host.</p>
+<p><strong>Pass:</strong> every guarantee names both the acknowledgement point and the failure model it covers.</p>
+<h3>11-E. Distinguish replication from backup and corruption detection from recovery</h3>
+<p>Delete a synthetic row on the primary and watch the deletion replicate to the standby. Then recover it from an earlier backup. Use the two-copy corruption experiment from Lab 08 and demonstrate what happens when both copies are bad.</p>
+<p>Create a retention policy for immutable backups, object versions, and event archives. Include a deletion/privacy policy so &quot;keep everything forever&quot; is not your default. Test restoring encrypted data with the correct key and failing without it; losing the only key can make intact bytes unusable.</p>
+<p><strong>Pass:</strong> the runbook covers accidental deletion, logical corruption, lost host, and missing encryption key as distinct scenarios, with explicit recoverable and unrecoverable cases.</p>
+<hr />
+<h1 id="lab-12">12. Security</h1>
+<p><strong>Project increment:</strong> replace teaching credentials with authenticated, tenant-isolated access and auditable operations.</p>
+<p><strong>Source alignment:</strong> authentication, authorization, data protection, application/network security, auditing, distributed security, decision frameworks, and anti-patterns. The exercises below are defensive tests against your own local application.</p>
+<h3>12-A. Replace fixture authentication without weakening authorization</h3>
+<p>The supplied <code>lab-alice</code>, <code>lab-bob</code>, and <code>lab-charlie</code> bearer strings are public development fixtures, not passwords or validated identity tokens. Do not deploy this configuration publicly.</p>
+<p>Create an <code>IdentityVerifier</code> interface returning a verified subject and permitted tenant memberships. Integrate a local identity provider or an identity provider's development tenant. Use its maintained verification library and documented issuer/JWKS configuration. Verify signature, allowed algorithm, issuer, audience, expiry, and required claims; do not merely decode a token. Resolve active tenant membership on the server rather than trusting an arbitrary request-body <code>tenantId</code>.</p>
+<p>Make a policy matrix for anonymous user, attendee, event organizer, and company administrator. Define permissions separately for viewing a public event, reading a private booking, managing an event, exporting attendees, and generating download tickets. An administrator of one tenant is not an administrator of every tenant.</p>
+<p><strong>Experiment:</strong> send a tampered token, expired token, wrong-audience token, valid token from the wrong tenant, and a valid attendee token attempting an organizer action. Test signing-key rotation and identity-provider unavailability under your chosen token-validation policy.</p>
+<p><strong>Pass:</strong> each negative case is rejected without leaking resource contents; provider failure never activates fixture authentication as a fallback. Existing records remain associated with stable internal user IDs.</p>
+<h3>12-B. Test object authorization at every entry point</h3>
+<p>Run the supplied HTTP tests, then write integration tests against the database-backed service. Alice's booking must remain inaccessible to Bob in the same tenant and Charlie in another tenant. Knowing a UUID is not permission to read the object. Object-level authorization is a specific OWASP API risk. [OWASP-BOLA]</p>
+<p>Extend the same checks to list queries, exports, object downloads, WebSocket subscriptions, search results, cache keys, background jobs, and shared links. A secure <code>GET /booking/:id</code> does not compensate for an unfiltered <code>/export</code> endpoint.</p>
+<p>Add a PostgreSQL row-level-security exercise using a <strong>separate non-owner application role</strong>, not the supplied <code>lab</code> bootstrap account. A representative policy is:</p>
+<pre><code class="language-sql">ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_boundary ON bookings
+USING (tenant_id = current_setting('app.tenant_id', true))
+WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+</code></pre>
+<p>Grant only needed table privileges to the new application role. Within a transaction, set context using <code>SELECT set_config('app.tenant_id', $1, true)</code> with a verified tenant value. Keep ownership checks for attendees in application policy or an additional RLS policy. Superusers, roles with <code>BYPASSRLS</code>, and ordinarily table owners can bypass RLS; changing only the policy while keeping a superuser connection does not demonstrate isolation. [PG-RLS]</p>
+<p><strong>Pass:</strong> reuse a pooled connection for different tenants and prove no previous transaction's tenant context persists. RLS is defense in depth, not a substitute for correct authorization.</p>
+<h3>12-C. Harden inputs, rendering, and resource consumption</h3>
+<p>Preserve parameterized SQL and the baseline's allowlist of booking fields. Add explicit schemas to every new endpoint, maximum pagination limits, bounded file sizes, allowed MIME types, and safe filenames generated by the server. Attempt to submit <code>status</code>, <code>tenantId</code>, and <code>userId</code> as unauthorized booking fields.</p>
+<p>For Pastebin, render user text as text rather than executable HTML. Test a paste containing <code>&lt;script&gt;</code> and HTML attributes as inert content. For file delivery, set an appropriate content type and content disposition. Test traversal-style filenames without writing outside the dedicated lab directory.</p>
+<p>For any URL-fetching feature, use only the local crawler fixture from Lab 17. Validate the final destination after every redirect and restrict protocols, hosts, ports, bytes, and duration. Do not permit arbitrary URLs to reach infrastructure metadata or internal services.</p>
+<p><strong>Pass:</strong> malformed requests produce controlled client errors, oversized requests are bounded, and input cannot modify tenant ownership or executable page content.</p>
+<h3>12-D. Separate secrets, network reachability, and audit evidence</h3>
+<p>Replace fixed development database credentials before any non-local deployment. Use a secrets mechanism appropriate to that deployment; do not commit secrets, private keys, database dumps, or <code>.env</code> files. Give the API, publisher, and worker distinct least-privilege roles as an exercise.</p>
+<p>Remove host-exposed database/broker ports when they are unnecessary, and expose only the intended gateway. Add TLS from Lab 01, then document whether internal connections also need encryption for the assumed threat model. Encryption without key recovery procedures creates a different durability risk.</p>
+<p>Emit structured audit records for permission changes, booking cancellation, data export, and share-link creation/revocation. Include actor, tenant, action, resource, outcome, and correlation ID, but not bearer tokens or full sensitive payloads. Restrict access to audit data and simulate rotation of a compromised signing key.</p>
+<p><strong>Pass:</strong> repository and log inspection reveal no real secrets; an unauthorized export attempt has a useful audit record; audit access is itself controlled.</p>
+<h3>12-E. Compare the four pillars using concrete incidents</h3>
+<p>Create a table with incidents as rows: API process down, acknowledged booking missing, repeated duplicate notifications, cross-tenant data exposure, and encryption key unavailable. Explain separately the effects on availability, reliability, durability, and security. These dimensions interact, but are not interchangeable.</p>
+<p>Write a short incident playbook for each: detection, containment, recovery source, verification query, and customer-visible impact. Define deletion and retention rules for synthetic user data and backups.</p>
+<p><strong>Pass:</strong> recovery does not reintroduce revoked permissions or silently resurrect deleted data. State the remaining risks instead of declaring the application universally secure.</p>
+<hr />
+<h1 id="lab-13">13. Maintainability</h1>
+<p><strong>Project increment:</strong> make the system safe to change and understandable after something fails.</p>
+<p><strong>Source alignment:</strong> architecture, engineering practices, testing, CI/CD, observability, infrastructure, documentation, and common anti-patterns.</p>
+<h3>13-A. Preserve a modular monolith before extracting services</h3>
+<p>Separate HTTP parsing, identity verification, booking rules, persistence, messaging, and provider adapters. The starter already separates several of these concerns; improve the boundaries rather than introducing a network hop for each class.</p>
+<p>Define a repository contract for <code>book</code>, <code>getBooking</code>, and <code>getEvent</code>. Run the same behavioral contract against <code>MemoryStore</code> and <code>PgStore</code>, while keeping PostgreSQL concurrency and rollback tests separate: a memory adapter is not proof of database behavior. Replace the fake notification adapter without editing the booking transaction.</p>
+<p><strong>Pass:</strong> changing an adapter does not change public API behavior. List the dependencies each module may import and fail a test or lint rule for forbidden dependencies.</p>
+<h3>13-B. Build a testing pyramid around invariants</h3>
+<p>Keep fast domain and HTTP tests for validation, authorization, idempotent replay, hashing, and circuit-breaker transitions. Add real PostgreSQL tests for concurrent guarded updates, transaction rollback, and uniqueness. Add broker integration tests for crash-before-ACK and replay after publish confirmation.</p>
+<p>Create a property-style test that generates sequences of booking attempts and retries. After each sequence, check inventory bounds and conservation. Preserve the seed of any failing generated sequence so it can be replayed.</p>
+<p>Add a contract test for the fake provider's timeout-after-effect behavior. Tests that assert only a mocked function was called cannot prove that retries are safe.</p>
+<p><strong>Pass:</strong> a deliberately removed inventory predicate, authorization filter, or deduplication key makes the corresponding test fail. The failure message identifies the violated invariant.</p>
+<h3>13-C. Automate a clean build and reversible deployment</h3>
+<p>Create a CI job that checks syntax, runs unit tests, builds containers, starts a disposable integration environment, seeds it, runs integration/race tests, and archives logs. Run each test job with its own Compose project name and database fixtures. Use secrets only where required and never upload sensitive dumps as public artifacts.</p>
+<p>The starter has no generated dependency lockfile because registry access was unavailable in the authoring environment. On your first successful install, commit the generated lockfile, switch reproducible builds to <code>npm ci</code>, and record the image digests you validated. Version tags alone are not a reproducibility proof.</p>
+<p>Practice the expand-contract migration from Lab 04. Deploy old and new API versions against the expanded schema before removing old fields. Roll application code back while retaining the compatible schema.</p>
+<p><strong>Pass:</strong> a fresh checkout can recreate the environment with documented commands, and a bad application release is rolled back without deleting the database.</p>
+<h3>13-D. Follow one request through asynchronous work</h3>
+<p>Propagate a request/trace correlation context from the HTTP request into the outbox message and worker log. Instrument database and broker spans, but redact sensitive attributes. OpenTelemetry's Node.js instructions explain initialization and the additional considerations for ESM instrumentation. [OTEL]</p>
+<p>Expose bounded-label metrics for route, method, status, dependency, and worker outcome. Do not use raw user IDs, URLs, booking IDs, or request IDs as metric labels. Those belong in appropriately protected logs or traces, where needed.</p>
+<p><strong>Experiment:</strong> slow the database, kill the publisher, and trigger a duplicate message. Find the relevant request, outbox row, retry, and notification without searching every log manually.</p>
+<p><strong>Pass:</strong> distinguish API latency, queue wait, worker duration, and end-to-end completion latency. A fast <code>201</code> does not imply the asynchronous notification has already been produced.</p>
+<h3>13-E. Document decisions and operational ownership</h3>
+<p>Create an architecture decision record for PostgreSQL inventory, Redis as a disposable cache, outbox delivery, and the deliberate absence of microservices initially. Each record needs context, alternatives, decision, evidence, consequences, and a condition that would trigger reconsideration.</p>
+<p>Write runbooks for database recovery, poison-message handling, key rotation, and schema rollback. Express infrastructure changes as reviewed configuration rather than unexplained manual console changes. Use an infrastructure-as-code tool only when it improves the target deployment; it is not needed to prove a local HTTP feature.</p>
+<p><strong>Pass:</strong> another learner can reproduce one failure and recovery using only the repository instructions. Remove any undocumented shell history dependency.</p>
+<hr />
+<h1 id="lab-14">14. API Design</h1>
+<p><strong>Project increment:</strong> make the EventHub API predictable under retries, concurrent updates, pagination, and asynchronous work.</p>
+<p><strong>Source alignment:</strong> REST principles, pagination, idempotency, versioning, security, performance, patterns, and anti-patterns.</p>
+<h3>14-A. Define contracts before adding endpoints</h3>
+<p>Write an OpenAPI contract for events, bookings, files, and asynchronous exports. Describe required fields, allowed fields, validation errors, authentication, and response headers. Keep successful resource creation distinct from an accepted background job. Use the HTTP specification to check method semantics, conditional requests, and status codes rather than inventing meanings. [HTTP]</p>
+<p>Add event creation and update endpoints restricted to organizers. Use stable error codes with a human-readable message and request ID. Keep internal SQL errors and stack traces out of responses.</p>
+<p><strong>Pass:</strong> generated or hand-written contract tests reject missing fields, unknown fields, malformed identifiers, and unauthorized operations consistently. A documented <code>Location</code> resolves to the relevant resource or job.</p>
+<h3>14-B. Replace offset pagination with a stable cursor</h3>
+<p>Create enough bookings for many pages. Start with offset pagination, insert new rows between requests, and observe duplicates or omissions under the selected ordering. Then use a unique, deterministic ordering such as <code>(created_at, id)</code> and an index matching the tenant and sort order.</p>
+<pre><code class="language-sql">SELECT id, created_at, status
+FROM bookings
+WHERE tenant_id = $1 AND user_id = $2
+  AND (created_at, id) &lt; ($3::timestamptz, $4::uuid)
+ORDER BY created_at DESC, id DESC
+LIMIT $5;
+</code></pre>
+<p>Use a separate first-page query without a cursor. Fetch <code>limit + 1</code> rows to determine whether another page exists. Preserve PostgreSQL timestamp precision in the cursor rather than silently truncating microseconds through a JavaScript <code>Date</code>. Bind the cursor to the tenant, sort, and filters; validate its version and sign it where tampering matters.</p>
+<p>Keyset pagination avoids some offset problems but does not automatically create a frozen snapshot while records are inserted or changed. Define snapshot versus live-feed semantics explicitly.</p>
+<p><strong>Pass:</strong> tied timestamps paginate without duplicates in an unchanged dataset, cross-tenant cursors are rejected, and maximum page size is enforced.</p>
+<h3>14-C. Test idempotency as a concurrent protocol</h3>
+<p>Inspect the starter's scope: <code>(tenant, user, route, key)</code>, plus a canonical request hash. The successful booking response is recorded in the same database transaction as inventory and outbox changes. Reusing the same key with a different valid payload is a conflict.</p>
+<p>Run <code>node scripts/integration.mjs</code> against the container stack. Extend it to send the same key through both API replicas simultaneously. Drop the client connection after the server commit but before receipt of the response, then retry with the same key.</p>
+<p>The teaching baseline stores successful responses indefinitely and does not cache failed attempts. Design retention, maximum storage, replay authorization, and API-version handling before changing that behavior. After a key is purged, a sufficiently late retry may become a new request; do not silently promise protection forever.</p>
+<p><strong>Pass:</strong> one logical request creates one booking and decrements inventory once. Equal payloads replay the documented outcome; different payloads never accidentally replay another operation.</p>
+<h3>14-D. Prevent lost updates with conditional writes</h3>
+<p>Expose an organizer-editable event representation with an authoritative version. Return a representation ETag and require <code>If-Match</code> for updates. Perform the version comparison in the database update itself, not in an earlier unprotected read:</p>
+<pre><code class="language-sql">UPDATE events
+SET title = $4, version = version + 1
+WHERE tenant_id = $1 AND id = $2 AND version = $3
+RETURNING *;
+</code></pre>
+<p>Two clients read the same version and submit different changes. Exactly one may update that version; the other receives the documented precondition failure. HTTP conditional requests define <code>If-Match</code> behavior. [HTTP]</p>
+<p>Add a compatible <code>/v2</code> or additive field migration and run old clients against it. Do not confuse URL versioning with concurrency versions.</p>
+<p><strong>Pass:</strong> stale writers cannot overwrite newer edits, and cache invalidation occurs only after the authoritative update succeeds.</p>
+<h3>14-E. Design asynchronous APIs and quotas</h3>
+<p>Add <code>POST /v1/exports</code>, returning a job resource and <code>202</code> while work is pending. Implement <code>GET /v1/jobs/:id</code> with tenant/owner authorization and states <code>queued</code>, <code>running</code>, <code>succeeded</code>, and <code>failed</code>. Define cancellation as best-effort or authoritative at explicit checkpoints, rather than assuming work disappears immediately.</p>
+<p>Add the atomic shared rate limiter from Lab 17. Return a useful retry indication for rejected requests and preserve a separate availability policy for authenticated writes. Bound request size, page size, and concurrent export count as well as request rate.</p>
+<p><strong>Pass:</strong> job IDs are not authorization, duplicate creation can be made idempotent, and worker failure leaves a recoverable state instead of permanent unobservable progress.</p>
+<hr />
+<h1 id="lab-15">15. Estimation Skills</h1>
+<p><strong>Project increment:</strong> predict a workload, test what the local system can sustain, and revise the model.</p>
+<p><strong>Source alignment:</strong> traffic, storage, bandwidth, cache sizing, worked examples, estimation frameworks, system patterns, and common pitfalls. Every number below is a teaching assumption, not an observed capacity of the starter or a claim about a named company.</p>
+<h3>15-A. Turn product assumptions into arrival rates</h3>
+<p>Assume 100,000 daily active users, 20 catalog requests per user per day, and a peak factor of ten. Calculate:</p>
+<pre><code class="language-text">Daily catalog requests = 100,000 * 20 = 2,000,000
+Average catalog RPS   = 2,000,000 / 86,400 = 23.15 approximately
+Assumed peak RPS      = 23.15 * 10 = 231.5 approximately
+</code></pre>
+<p>Model writes separately: for example, 5,000 booking attempts/day with a different event-opening spike profile. Include retries, background workers, polling, and administrative exports rather than treating all traffic as user page loads.</p>
+<p><strong>Pass:</strong> every multiplier has a unit and an explicit assumption. Change one assumption by ten times and identify the first component likely to be affected.</p>
+<h3>15-B. Estimate storage from measured rows and retention</h3>
+<p>Seed representative rows, then inspect relation and index sizes with <code>pg_total_relation_size</code> and <code>pg_indexes_size</code>. Include bookings, idempotency responses, outbox events, notification records, indexes, WAL, replicas, backups, and retention. Do not multiply logical application bytes once and label that the whole storage bill.</p>
+<p>For attachments, keep logical uploaded bytes, physical deduplicated bytes, versions, replica copies, and incomplete uploads separate. An average file size alone may hide a costly large-file tail.</p>
+<p><strong>Pass:</strong> produce a one-year storage table with separate assumptions and compare at least one estimated row/object size with an actual measurement.</p>
+<h3>15-C. Calculate bandwidth and cache requirements</h3>
+<p>Assume a 20 KiB compressed catalog response at the proposed peak. The application payload rate is approximately <code>231.5 * 20 * 1024</code> bytes/s, before protocol overhead. Report bytes/s and bits/s correctly.</p>
+<p>At a 90% cache hit ratio for those reads, the nominal miss rate is about 23.15/s. That is not the entire database workload: writes, cache fills, invalidations, misses for other endpoints, and administrative operations remain.</p>
+<p>Size Redis from measured entry size and the working-set distribution, plus overhead and headroom. Simulate a cold-cache restart and a popularity shift.</p>
+<p><strong>Pass:</strong> your model explains why a high average hit ratio does not prevent a database spike during mass expiry or recovery.</p>
+<h3>15-D. Estimate capacity and verify the bottleneck</h3>
+<p>Use a measured sustainable throughput per replica at your selected latency/error target. For illustration only, suppose one isolated replica supports 300 requests/s under a representative workload. At a deliberate 60% utilization allowance, use 180 requests/s per replica for planning:</p>
+<pre><code class="language-text">Required serving replicas = ceil(231.5 / 180) = 2
+With one-replica-loss reserve = 3 total replicas
+</code></pre>
+<p>This simplified calculation assumes the database and other shared dependencies can support the total load. Measure that assumption; extra API replicas can otherwise just increase database contention.</p>
+<p>For a stable stage, relate average concurrency to throughput times <strong>mean</strong> residence time. Do not substitute a p95 latency into an average-law calculation and call it exact. Under overload, model queue growth and rejection rather than assuming a stable queue.</p>
+<p><strong>Pass:</strong> record load-generator saturation and dropped iterations, not just server metrics. Distinguish a measured local result from a hypothetical regional deployment.</p>
+<h3>15-E. Write an estimation decision memo</h3>
+<p>Create a one-page memo containing workload assumptions, read/write mix, peak shape, data growth, bandwidth, cache budget, candidate bottleneck, proposed SLO, capacity headroom, and cost categories. Include a sensitivity table for ten-times more users, ten-times larger objects, and ten-times more retries.</p>
+<p>Run one load experiment that could falsify the memo. Revise the estimate and explain why it changed. Do not memorize generic latency numbers when your actual workload can be measured.</p>
+<p><strong>Pass:</strong> another engineer can reproduce the arithmetic, identify uncertain inputs, and see exactly which measurements would improve the decision.</p>
+<hr />
+<h1 id="lab-16">16. HLD Architecture and Frameworks</h1>
+<p><strong>Project increment:</strong> connect the component-level experiments into an architecture that has a defensible purpose.</p>
+<p><strong>Source alignment:</strong> mental models, six-step and rapid interview frameworks, decision trees, architecture templates, archetypes, cross-concept links, anti-patterns, and walkthroughs. Your index names these frameworks but does not contain their actual steps or the 70-problem master map. The process below is a newly authored implementation review, not a reconstruction of those missing sections.</p>
+<h3>16-A. Produce six evidence-backed design artifacts</h3>
+<p>Create these six artifacts for EventHub: (1) functional requirements and explicit exclusions; (2) invariants, SLOs, and failure assumptions; (3) workload and capacity estimates; (4) API contracts and data model; (5) architecture with synchronous/asynchronous boundaries; and (6) failure experiments, tradeoffs, and operational plan.</p>
+<p>Every box in the architecture should point to code, configuration, a contract, or a clearly labeled planned extension. Distinguish deployed components from things merely drawn in a diagram.</p>
+<p><strong>Pass:</strong> demonstrate one complete request from client to durable state and asynchronous effect, including the exact point at which success is acknowledged.</p>
+<h3>16-B. Use a decision tree that can remove technology</h3>
+<p>For each proposed component, ask: what measured or required problem does it solve; can an existing component solve it; what new failure mode does it add; how will it be tested; and when would it be removed?</p>
+<p>Apply this to Redis, RabbitMQ, a search service, database sharding, and microservices. Compare the baseline modular monolith with a version where notification processing is independently deployed. Do not extract the inventory invariant across services merely to increase the number of services.</p>
+<p><strong>Pass:</strong> remove one unjustified component from a hypothetical overbuilt design and show which guarantees remain intact. Record the trigger that would justify adding it later.</p>
+<h3>16-C. Trace quality attributes through the same feature</h3>
+<p>Take <code>POST /v1/bookings</code>. Explain its networking path, scalability limit, consistency requirement, availability behavior, database transaction, cache policy, asynchronous effects, storage needs, retry behavior, latency budget, durability boundary, authorization, test coverage, API semantics, and capacity estimate.</p>
+<p>Use the actual implementation as evidence. For example, Redis is not consulted to decide whether a seat can be sold; a stopped broker leaves outbox work pending; loss of the single PostgreSQL instance still affects the baseline's write availability.</p>
+<p><strong>Pass:</strong> no quality attribute is described only with a buzzword such as &quot;highly available&quot; or &quot;eventually consistent.&quot; State which operation, what observation, and under which failure.</p>
+<h3>16-D. Rehearse the architecture as a technical review</h3>
+<p>Give yourself a constrained presentation window and explain the design without reading notes. Then have a reviewer introduce one change: global writers, tenfold spike, regional loss, strict deletion, collaborative editing, or payment-provider uncertainty.</p>
+<p>Choose the matching family from Lab 17, identify what must change, and propose the next experiment. Do not claim the existing local tests prove a multi-region guarantee.</p>
+<p><strong>Pass:</strong> finish with a tradeoff sentence supported by evidence, such as: &quot;We keep inventory on one authoritative database because the required no-oversell invariant is simpler to enforce there; this limits write availability during primary failure, so failover fencing is a separate tested requirement.&quot;</p>
+<hr />
+<h1 id="lab-17">17. Roadmaps and System Pattern Projects</h1>
+<p><strong>Source alignment:</strong> all fourteen named system-pattern families in the uploaded roadmap index. Its original 8-week and 120-day schedules are not attached. The projects and suggested sequence here are newly authored.</p>
+<p>Complete these as branches or small services around EventHub. Do not make every subsystem a mandatory dependency of the basic booking application.</p>
+<h3>17-P01. CRUD / storage-based systems: organizer document manager</h3>
+<p><strong>Implement:</strong> add <code>documents(id, tenant_id, owner_id, object_key, version, deleted_at)</code> and create/read/update/delete endpoints. Store bytes through the storage adapter from Lab 08 and metadata in PostgreSQL. Use generated object keys, authorization on every operation, and version-conditional updates.</p>
+<p><strong>Build sequence:</strong> first implement metadata CRUD; then stage object uploads before committing an available document; finally add soft deletion, retention, and an orphan-object collector. Define the response when bytes exist but metadata creation fails.</p>
+<p><strong>Break it:</strong> crash between object upload and metadata commit; concurrently edit the same version; delete a document while a download request is being authorized.</p>
+<p><strong>Pass:</strong> no cross-tenant document is exposed, a failed upload does not become a readable completed file, and orphan cleanup does not delete an object referenced by a committed live version. Record the retention and revocation window for already issued download tickets.</p>
+<h3>17-P02. Feed / timeline systems: followed-event activity feed</h3>
+<p><strong>Implement:</strong> <code>follows(follower_id, organizer_id)</code>, immutable <code>posts</code>, and <code>feed_entries(user_id, post_id)</code> with a uniqueness constraint. Expose a cursor-paginated feed.</p>
+<p><strong>Build sequence:</strong> calculate the initial feed at read time from followed organizers; then fan out a post asynchronously into follower inboxes; finally use a hybrid where extremely high-follower organizers are merged at read time. Choose the fan-out threshold from measured write/read amplification, not a copied industry number.</p>
+<p><strong>Break it:</strong> replay a fan-out job, publish while a follow is added, remove access to a private post, and give one organizer most followers. Decide how edits and deletions propagate and how current authorization filters an old feed entry.</p>
+<p><strong>Pass:</strong> replay does not create duplicate feed entries, pagination uses a stable tie-breaker, and revoked private content is not exposed just because its ID remains in a materialized inbox. Compare storage, publish delay, and read latency across strategies.</p>
+<h3>17-P03. Real-time systems: event support chat</h3>
+<p><strong>Implement:</strong> rooms, authorized memberships, and durable messages keyed by <code>(room_id, sequence)</code>, plus unique <code>(room_id, sender_id, client_message_id)</code>. Expose WebSocket send/subscribe and a history endpoint accepting <code>afterSequence</code>.</p>
+<p><strong>Build sequence:</strong> persist a message before acknowledging it; allocate a per-room sequence under a database lock in the same transaction; broadcast committed messages across API replicas; then implement reconnect, missed-message replay, duplicate suppression, and bounded slow-client buffers. Keep presence as separate TTL-based ephemeral state.</p>
+<p><strong>Break it:</strong> disconnect a client after persistence but before receipt of the ACK; resend its client message ID; move it to another replica; drop an intermediate broadcast. Pub/sub alone cannot recover a missed durable message.</p>
+<p><strong>Pass:</strong> one logical message has one durable identity, reconnect fills sequence gaps from storage, room authorization is checked, and a slow consumer cannot exhaust server memory. A per-room counter is a conscious contention tradeoff.</p>
+<h3>17-P04. Search systems: searchable event catalog</h3>
+<p><strong>Implement:</strong> an initial PostgreSQL full-text index on normalized event text, with tenant and visibility filters. Inspect its query plan. PostgreSQL's text-search documentation describes document/query matching and indexing choices. [PG-SEARCH]</p>
+<p><strong>Build sequence:</strong> start with search over authoritative rows; add an asynchronously maintained projection containing event ID, version, searchable text, and deletion marker; then implement projection rebuild from a consistent source snapshot plus catch-up changes. An external search engine is an optional adapter, not a prerequisite.</p>
+<p><strong>Break it:</strong> deliver update version 8 before version 7; delete an event while rebuilding; pause the indexer; replay events. Keep permission checks current even while searchable text is stale.</p>
+<p><strong>Pass:</strong> older updates cannot resurrect deleted or newer content, index lag is measurable, and a rebuilt index is checked before a controlled cutover. State whether read-after-edit search freshness is guaranteed or explicitly eventual.</p>
+<h3>17-P05. Rate limiter / throttling: shared tenant quotas</h3>
+<p><strong>Implement:</strong> token-bucket admission keyed by a verified tenant and operation. Start with the supplied single-process <code>TokenBucket</code>; observe that two replicas each granting a full quota violate a shared limit.</p>
+<p><strong>Build sequence:</strong> wire <code>infra/token_bucket.lua</code> through Redis <code>EVAL</code> with one key and arguments <code>capacity</code>, <code>refillTokensPerSecond</code>, and <code>cost</code>. The script uses Redis time, validates arguments before mutation, and atomically updates token state. Redis scripts execute atomically with respect to other commands; that does not mean arbitrary runtime errors roll back earlier writes. [REDIS-LUA]</p>
+<p>Example, using a fresh dedicated quota key:</p>
+<pre><code class="language-bash">docker compose exec -T redis redis-cli --eval /dev/stdin quota:org-a:booking , 10 2 1 &lt; infra/token_bucket.lua
+</code></pre>
+<p>The result is <code>{allowed, retryAfterMilliseconds, remainingWholeTokens}</code>. Add a bounded HTTP retry indication and record rejected requests. Move quota state out of an evicting general-purpose cache for any exercise requiring dependable enforcement.</p>
+<p><strong>Break it:</strong> concurrently request from both APIs, exhaust the burst, wait for refill, restart Redis, and trigger an outage. Define fail-open versus fail-closed behavior per operation. Cached reads and suspicious authentication attempts need not share a failure policy.</p>
+<p><strong>Pass:</strong> under the stated single-Redis failure model, concurrent requests respect burst/refill limits. Explicitly document quota reset, failover, clock, and storage-loss limitations.</p>
+<h3>17-P06. Logging / metrics / monitoring: a small telemetry pipeline</h3>
+<p><strong>Implement:</strong> collect the starter's <code>/metrics</code>, structured logs, and trace context. Add request rate, error ratio, p95, database pool wait, outbox age, queue depth, and worker retry metrics.</p>
+<p><strong>Build sequence:</strong> scrape each replica separately, build a route-level dashboard, and define alerts tied to user symptoms and queue-age objectives. Keep high-cardinality IDs out of metric labels. Store diagnostic traces/logs separately with access control and retention.</p>
+<p><strong>Break it:</strong> label a disposable test metric with every booking ID and compare series growth; then remove that label. Stop the metrics collector and verify booking behavior remains independent. Cause a notification backlog while API latency stays normal.</p>
+<p><strong>Pass:</strong> an alert distinguishes request failures from asynchronous delay; collector loss does not take down booking; a runbook links symptoms to useful diagnostic queries rather than alerting on every CPU fluctuation.</p>
+<h3>17-P07. Distributed caching systems: sharded catalog cache</h3>
+<p><strong>Implement:</strong> route event cache entries across two cache nodes using <code>shardFor</code> from the starter. Cache nodes remain disposable copies; PostgreSQL retains authority.</p>
+<p><strong>Build sequence:</strong> measure remapping when a node is added or removed; compare against modulo routing; add bounded per-process L1 caches and versioned invalidations; then introduce a hot-key replication or local coalescing strategy.</p>
+<p><strong>Break it:</strong> remove a node during a cold-cache period, delay invalidations, and make one key dominate traffic. Membership disagreement between clients must be observable, and a cache miss on one node must not be mistaken for authoritative absence.</p>
+<p><strong>Pass:</strong> cache node loss never loses a booking, fallback load is bounded or explicitly rejected, and you can quantify remapping, hit ratio, stale-read behavior, and hot-key load. Do not claim local cache experiments prove a production distributed-cache consistency protocol.</p>
+<h3>17-P08. Recommendation systems: relevant-event suggestions</h3>
+<p><strong>Implement:</strong> synthetic user interactions, event tags, and a recommendation endpoint. Begin with a popularity baseline, then score tag overlap with a user's prior positive interactions. Persist model or ruleset version with each recommendation batch.</p>
+<p><strong>Build sequence:</strong> split synthetic history chronologically into training and evaluation sets; compare the personalized method with popularity using a chosen ranking metric; then add a fallback for new users and new events. Keep eligibility and tenant permissions outside the ranking score so recommendations cannot reveal forbidden events.</p>
+<p><strong>Break it:</strong> remove all history for a user, introduce a new tag, create a popularity spike, and replay duplicate interaction events. Check that future interactions never leak into training data for earlier evaluations.</p>
+<p><strong>Pass:</strong> the endpoint serves eligible items, duplicates do not inflate the chosen counters, cold-start behavior is explicit, and any quality claim is supported by your evaluation data rather than the label &quot;AI.&quot;</p>
+<h3>17-P09. Payment / financial systems: a simulated payment ledger</h3>
+<p><strong>Implement:</strong> a local fake payment provider, payment attempts, immutable ledger entries, and a reconciliation worker. Use integer minor currency units and keep currencies separate. Implement balanced debit/credit entries for each ledger transaction; reject unbalanced postings transactionally.</p>
+<p><strong>Build sequence:</strong> persist a payment request with a stable provider idempotency key; make the provider call outside long-held inventory transactions; process signed fake callbacks using raw request bytes; deduplicate provider event IDs; reconcile unknown outcomes by querying the provider's simulated records.</p>
+<p><strong>Break it:</strong> the provider records a charge but drops the response; it sends the callback twice or out of order; the booking expires before a late success; a refund request times out after taking effect.</p>
+<p><strong>Pass:</strong> one business payment is not accidentally charged twice by your own retries, ledger postings balance per currency, and ambiguous outcomes become reconciled states rather than an invented failure or success. Refunds are independently idempotent. This is a teaching simulator, not a payment-compliance or accounting certification.</p>
+<h3>17-P10. Large-scale processing: attendance analytics pipeline</h3>
+<p><strong>Implement:</strong> generate synthetic newline-delimited JSON attendance records, partition work by event/date, and compute daily attendance aggregates. Give each input record a stable event ID and each batch a deterministic identity.</p>
+<p><strong>Build sequence:</strong> start with a bounded streaming parser; add checkpointed workers; make output and checkpoint updates atomic in the same database transaction where possible; then compare batch and incremental processing. Define how late-arriving and corrected events update previous aggregates.</p>
+<p><strong>Break it:</strong> kill a worker after output write but before checkpoint, duplicate a partition assignment, include malformed rows, and insert events older than the current processing window. Do not retain the entire input file in memory.</p>
+<p><strong>Pass:</strong> replay yields the same declared aggregate, invalid rows are accounted for, memory remains bounded, and an externally written output sink has a documented deduplication/commit strategy rather than an unsupported &quot;exactly once&quot; claim.</p>
+<h3>17-P11. Geospatial / location-based systems: nearby venue discovery</h3>
+<p><strong>Implement:</strong> an optional PostGIS-enabled database with <code>geography(Point,4326)</code> venue locations and a GiST index. Generate fictional coordinates for testing, not personal location data. Store points in longitude/latitude order.</p>
+<p><strong>Build sequence:</strong> implement <code>GET /venues/nearby</code> with validated coordinates and a bounded radius; use <code>ST_DWithin</code> for filtering and a defined distance ordering; inspect the plan and boundary results. For geography values, PostGIS defines the distance parameter in meters. [POSTGIS]</p>
+<p>Add synthetic courier or event-staff locations with timestamps and a freshness cutoff. Keep geographic candidate selection separate from the atomic assignment transaction.</p>
+<p><strong>Break it:</strong> swap latitude/longitude in a fixture, request an excessive radius, use stale location updates, and have two dispatchers assign the same worker concurrently.</p>
+<p><strong>Pass:</strong> nearby results respect units and tenant visibility; stale presence is labeled/excluded according to policy; one worker cannot receive conflicting active assignments under the chosen constraint.</p>
+<h3>17-P12. Collaborative systems: shared event-planning document</h3>
+<p><strong>Implement:</strong> a local collaborative text editor using Yjs with your own local sync server and durable update storage. Start with the official editor/provider example, then add room authorization before using any private data. [YJS]</p>
+<p><strong>Build sequence:</strong> connect two clients, save updates, disconnect one, edit both independently, reconnect, and verify convergence. Add snapshots and update compaction only after replay from the original update log is verified. Maintain separate access-control state; conflict-free document merging does not decide who is allowed to edit.</p>
+<p><strong>Break it:</strong> duplicate and reorder updates, reload from storage, revoke a user's membership while connected, and attempt to join another tenant's room. Do not put private content into a public demonstration provider.</p>
+<p><strong>Pass:</strong> authorized replicas converge under the library's supported synchronization model, updates survive server restart, and revoked users cannot keep submitting accepted new edits. Explain how this differs from whole-file conflict copies in the Drive capstone.</p>
+<h3>17-P13. Infrastructure / system utilities: scheduled-job leases and IDs</h3>
+<p><strong>Implement:</strong> <code>jobs(id, due_at, status, lease_owner, lease_until, fencing_token)</code> and competing schedulers. Claim due work in a transaction, incrementing a monotonic fencing token for every successful lease acquisition. Use database time for lease comparisons.</p>
+<p><strong>Build sequence:</strong> make job effects idempotent; require the current token when committing guarded local effects; add renewal and bounded retry; then test expired workers. A lease alone does not stop a paused process from resuming after another worker has taken over.</p>
+<p><strong>Break it:</strong> pause worker A until its lease expires, let B claim a newer token, then resume A. Its stale token must be rejected by the resource that commits the effect. External providers need their own idempotency/fencing mechanism; a database token cannot magically protect an unrelated remote write.</p>
+<p>Add an ID-generator comparison: database sequence, random UUID, and a teaching time-based generator. Force clock rollback and process restarts in the time-based implementation; retain database uniqueness as a final check.</p>
+<p><strong>Pass:</strong> stale workers cannot commit protected effects, IDs remain unique under the tested assumptions, and you explain why this utility is not a home-built replacement for a consensus system.</p>
+<h3>17-P14. Web crawler / search indexing: local documentation search</h3>
+<p><strong>Implement:</strong> a local fixture website containing linked pages, a redirect, duplicate content, <code>robots.txt</code>, a slow endpoint, and an oversized response. Crawl only this explicitly allowlisted local site.</p>
+<p><strong>Build sequence:</strong> persist a URL frontier with uniqueness and statuses; normalize URLs deliberately; apply per-host concurrency/delay limits; parse robots rules; stream bounded response bodies; compute a content hash; extract text; and feed the search projection from P04. The robots protocol communicates crawler rules, not access authorization. [ROBOTS]</p>
+<p><strong>Break it:</strong> create a link cycle, redirect toward a disallowed host/port, return repeated errors, duplicate the same page under two URLs, and interrupt a worker. Revalidate redirects and use bounded retries rather than expanding to arbitrary networks.</p>
+<p><strong>Pass:</strong> the crawler stays within its allowlist, terminates or checkpoints predictably, does not repeatedly index duplicate frontier jobs, and can rebuild a search index from its recorded synthetic documents.</p>
+<h3>17-A. Suggested execution sequence</h3>
+<p>Use this as a milestone-based sequence, not a promise that mastery takes a fixed number of hours. The week labels are an optional organization for your own pace.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Build and measure</th>
+<th>Evidence required before moving on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Week 1</td>
+<td>Baseline, networking, initial API contract, database model</td>
+<td>First request trace, passing baseline tests, reproducible setup</td>
+</tr>
+<tr>
+<td>Week 2</td>
+<td>Database races, consistency, idempotency, estimation</td>
+<td>One-seat concurrency proof, workload assumptions</td>
+</tr>
+<tr>
+<td>Week 3</td>
+<td>Caching, scalability, latency</td>
+<td>Controlled before/after benchmark, stale-fill experiment</td>
+</tr>
+<tr>
+<td>Week 4</td>
+<td>Messaging, availability, reliability</td>
+<td>Crash-before-ACK recovery, outage behavior, bounded retries</td>
+</tr>
+<tr>
+<td>Week 5</td>
+<td>Storage, durability, security, maintainability</td>
+<td>Restore drill, tenant tests, CI/runbook evidence</td>
+</tr>
+<tr>
+<td>Week 6</td>
+<td>URL Shortener and Pastebin capstones</td>
+<td>Expiry, collision, orphan-cleanup and cache tests</td>
+</tr>
+<tr>
+<td>Week 7</td>
+<td>BookMyShow and Drive/Dropbox capstones</td>
+<td>Hold/payment race tests, offline sync conflict recovery</td>
+</tr>
+<tr>
+<td>Week 8</td>
+<td>Selected pattern projects and architecture defense</td>
+<td>Demonstration, measurements, tradeoffs, remaining limitations</td>
+</tr>
+</tbody>
+</table>
+<p>All fourteen pattern projects can be completed afterwards or interleaved where relevant. They are not realistically equivalent in effort. Work on one unfinished invariant at a time rather than starting fourteen incomplete systems.</p>
+<p>For each topic, end with three interview questions: what guarantee did you implement; what failure invalidates it; and what evidence would justify a different design? Preserve your measured results and failed experiments in <code>evidence/</code>, not only screenshots of a successful UI.</p>
+<hr />
+<h1 id="lab-18">18. Capstone - URL Shortener</h1>
+<p><strong>Project:</strong> LinkHub, a tenant-managed short-link service with a public redirect endpoint.</p>
+<p><strong>Source alignment:</strong> the upload lists this case-study title but does not include its worked solution or detailed subsections. This is a newly authored capstone.</p>
+<h3>18-A. Implement a small correct service</h3>
+<p>Create <code>links(slug PRIMARY KEY, tenant_id, owner_id, target_url, version, expires_at, deleted_at, created_at)</code>. If the public redirect path is only <code>/s/:slug</code>, the slug must be unique globally, not merely within a tenant. Alternatively include a tenant-specific domain or path in the lookup identity.</p>
+<p>Implement authenticated <code>POST /v1/links</code>, owner-authorized <code>GET/PATCH/DELETE /v1/links/:slug</code>, and public <code>GET /s/:slug</code>. Accept only the intended URL schemes, reject control characters, limit lengths, and define abuse handling. Do not make the server fetch arbitrary destination URLs merely to validate their existence.</p>
+<p>Generate ten-character Base62 slugs using a cryptographically secure random generator with unbiased character selection; insert under the unique constraint and retry a bounded number of collisions. For comparison, implement sequence-to-Base62 allocation and document its enumeration properties. A short-link identifier is not an authorization token for confidential data.</p>
+<p><strong>Pass:</strong> forced collisions produce another slug rather than overwriting an existing destination. Access to the management API remains tenant/owner restricted.</p>
+<h3>18-B. Add caching, expiry, and safe management semantics</h3>
+<p>Cache public destination records with version and expiry metadata. Use temporary redirects during the lab and an explicit browser-cache policy, so a permanent cached redirect does not defeat later revocation experiments. Validate logical expiry on the read path; do not wait for a cleanup worker to hide expired links.</p>
+<p>For an update, use <code>If-Match</code>/version-conditional writes. Test the stale-fill race from Lab 06 and state the maximum allowed staleness for a changed or disabled destination. Choose a stricter authoritative check when the stated revocation requirement demands it.</p>
+<p><strong>Break it:</strong> warm the cache, change the target, disable the link, delay invalidation, and request it through both API replicas.</p>
+<p><strong>Pass:</strong> outcomes match the documented expiry and revocation policy. Disabling a link cannot retroactively erase a destination already received by a browser; make that boundary explicit.</p>
+<h3>18-C. Decouple click analytics and compare key allocation</h3>
+<p>Persist or enqueue a click event with a chosen identity. Decide whether the metric counts HTTP redirect requests, deduplicated events, sessions, or estimated unique visitors; these are different numbers. Keep privacy-sensitive data out of the default payload.</p>
+<p>Make analytics failure either a bounded best-effort loss or a durably acknowledged requirement. Do not claim both guaranteed lossless analytics and zero dependency on its durable acceptance path.</p>
+<p>As an advanced allocation exercise, build a pre-generated key pool with transactional claims. Crash after claiming but before creating the link. Decide whether unused keys are permanently burned or safely recoverable under an explicit claim protocol. Never reassign a slug already visible to a client.</p>
+<p><strong>Pass:</strong> retries and worker replay follow the declared counting semantics; the redirect latency is measured with analytics healthy and unavailable.</p>
+<h3>18-D. Test scale and defend the architecture</h3>
+<p>Generate a read-heavy synthetic workload with one hot slug, a long tail, invalid slugs, and management writes. Compare no cache, shared cache, and local-plus-shared caching. Stop Redis and observe database load and admission behavior.</p>
+<p>Required demonstrations: forced key collision; duplicate create request; expiry while cached; deletion during a read; cross-tenant management attempt; database outage; analytics replay; and hot-key traffic. Produce the API contract, schema, architecture, estimates, benchmark evidence, and one-page tradeoff memo.</p>
+<p><strong>Completion gate:</strong> no collision overwrites, no unauthorized management, no expired-link exposure beyond the declared read policy, and no unsupported claim of global scale from a laptop benchmark.</p>
+<hr />
+<h1 id="lab-19">19. Capstone - Pastebin</h1>
+<p><strong>Project:</strong> PasteHub, a text-sharing service with expiry, object storage, and optional access restrictions.</p>
+<p><strong>Source alignment:</strong> requirements, capacity, APIs, database design, key generation, multilayer caching, three-layer expiry, Bloom filters, multi-region choices, failure scenarios, security, and scaling. The design below implements these indexed themes; it is not the missing original worked solution.</p>
+<h3>19-A. Separate metadata from content with explicit states</h3>
+<p>Reuse LinkHub key allocation, but add <code>pastes(id, tenant_id, owner_id, object_key, bytes, sha256, visibility, expires_at, version, state)</code>. Define <code>uploading</code>, <code>available</code>, and <code>deleted</code> states. Expose create, read, owner delete, and optional metadata update endpoints.</p>
+<p>Write content through the storage adapter with a byte limit and SHA-256 checksum. Commit available metadata only after the content object is verified. If upload succeeds but metadata creation fails, leave a tracked orphan eligible for later cleanup. Use an ownership check for private content; an unlisted URL is not equivalent to authenticated private access.</p>
+<p><strong>Pass:</strong> readers never receive a successfully advertised paste whose object was never completed; interrupted writes are recoverable without arbitrary deletion of shared live objects.</p>
+<h3>19-B. Implement three distinct expiry layers</h3>
+<p>For this lab, define the three layers explicitly: (1) logical expiry enforced by the read path; (2) cache lifetime bounded by the remaining expiry interval, with the expiry value also checked on cache hits; and (3) asynchronous physical cleanup after a grace interval.</p>
+<p>Create a paste expiring shortly, warm every cache, stop the cleanup worker, and request it after the deadline. It must become logically unavailable even though bytes still exist. Then resume cleanup and verify physical removal according to retention policy.</p>
+<p>Use an injectable test clock for deterministic boundary tests; define the deployed system's clock source and acceptable skew. Do not infer strict global expiry from synchronized laptop processes.</p>
+<p><strong>Pass:</strong> cleanup delays do not make an expired paste readable. A retrying cleaner does not delete a newly created or still-referenced object.</p>
+<h3>19-C. Add a Bloom filter without creating false 404s</h3>
+<p>Implement a membership filter for paste IDs and measure how many random nonexistent-ID requests can avoid a database lookup. Compare memory usage and false-positive rate with an exact set.</p>
+<p>Then pause filter updates, create a paste in the database, and query it. This is the important distributed-system failure: a filter that has not seen the new ID can reject valid data even though the Bloom algorithm itself has no false negatives for inserted elements.</p>
+<p>Build the filter from a snapshot plus a reliable catch-up stream, version its generation, and bypass negative decisions whenever completeness is not established. Cache negative lookups only with an explicit creation/invalidation policy.</p>
+<p><strong>Pass:</strong> no valid paste is rejected because the active filter is stale or partially rebuilt. False positives may cost an extra database lookup; an unsafe negative must not become an authoritative 404.</p>
+<h3>19-D. Render safely and test object/cache behavior</h3>
+<p>Serve paste text as inert text or safely escaped content. Test HTML/script content, large Unicode text, invalid encoding, oversized requests, unauthorized reads, deletion while cached, and a storage outage. Include rate limits for both creation and invalid-ID enumeration within your own lab.</p>
+<p>Add a read-through cache wrapper and optionally a simulated edge cache for public, permitted content. Private authorization and strict revocation must not be bypassed by a shared public cache key.</p>
+<p><strong>Pass:</strong> text is not executed, private data is not cached for unrelated users, and checksum mismatch produces an observable failure rather than a silently altered paste.</p>
+<h3>19-E. Evaluate multi-region and 100-times growth as experiments</h3>
+<p>Model a home-writer region and a delayed read projection. Replicate available metadata, expiry, deletion markers, and object presence deliberately; do not publish remote metadata before its bytes are accessible under your read contract.</p>
+<p>For strict deletion or permission revocation, choose an authoritative check or a fail-closed policy when freshness cannot be confirmed. Compare that with a deliberately eventual public-paste policy.</p>
+<p>Multiply workload assumptions by 100, then identify which local subsystem you can actually stress: key generation, negative lookups, cache memory, object throughput, or cleanup lag. Report simulations and extrapolations separately from measurements.</p>
+<p><strong>Completion gate:</strong> demonstrate upload-orphan recovery, cached expiry, safe filter rebuild, duplicate creation, private access denial, deletion propagation, and a coherent capacity memo.</p>
+<hr />
+<h1 id="lab-20">20. Capstone - BookMyShow</h1>
+<p><strong>Project:</strong> SeatHub, reserved-seat booking with expiring holds and a simulated payment provider. This extends the baseline's quantity-based inventory; it is not already implemented by that baseline.</p>
+<p><strong>Source alignment:</strong> seat reservation, end-to-end booking, live seat maps, thundering herds, cancellation/refunds, search, regions, failures, security, and scaling.</p>
+<h3>20-A. Model seats and atomically acquire multi-seat holds</h3>
+<p>Create <code>shows</code>, <code>show_seats(show_id, seat_id, state, hold_id, hold_until, version)</code>, <code>holds</code>, <code>bookings</code>, and <code>payment_attempts</code>. The seat row's primary key is <code>(show_id, seat_id)</code>; add appropriate tenant relationships. Define a legal state-transition table before coding.</p>
+<p>Implement <code>POST /shows/:id/holds</code> with a sorted, duplicate-free list of requested seat IDs. In one short database transaction, lock the relevant rows in a stable order, confirm every requested row exists, verify all are available or logically expired, and assign one unguessable hold ID and expiry. Roll back the entire request when any seat is unavailable.</p>
+<p>Use database time and check expiry at the point protected by the row locks. PostgreSQL's <code>now()</code> is fixed at transaction start; for a boundary test after waiting on a lock, use a fresh clock value where the business rule requires it. Row locks and transaction isolation are described in the PostgreSQL references. [PG-LOCK] [PG-ISO]</p>
+<p><strong>Pass:</strong> two concurrent requests cannot hold the same seat; a three-seat request either gets all three or none; conflicting multi-seat requests do not leave partial holds.</p>
+<h3>20-B. Make expiry and ownership authoritative</h3>
+<p>Implement <code>GET /holds/:id</code>, owner release, and a background expiry cleaner. The cleaner is housekeeping, not the sole expiry enforcement mechanism. Every confirm/release operation must verify current hold identity and allowed state. A newer holder must not be affected by a delayed request carrying the old hold ID.</p>
+<p>Add a version/fencing check where jobs act on an earlier seat state. Expiry cleanup should conditionally clear only the matching expired hold, not every row named in an old work item.</p>
+<p><strong>Break it:</strong> pause an expiry worker, allow the old hold to expire, acquire a new hold, then resume the old worker.</p>
+<p><strong>Pass:</strong> a stale cleanup or release cannot erase the new holder's reservation. Define what the UI displays when its cached seat map is behind the database.</p>
+<h3>20-C. Integrate fake payment without long-held inventory locks</h3>
+<p>Implement a local provider that records payments by a stable idempotency key and can deliberately time out after recording a successful charge. Create a payment-attempt record before calling it. Do not keep a seat row locked while waiting on a network request.</p>
+<p>For this lab, choose a clear rule: a successful provider response/callback may confirm a booking only when the original hold still owns all seats and remains valid at the confirmation transaction. An alternative bounded payment-in-progress extension is possible, but must be explicitly modeled and tested rather than implicitly holding forever.</p>
+<p>Deduplicate signed fake callbacks using provider event IDs. Handle <code>pending</code>, <code>succeeded</code>, <code>failed</code>, <code>unknown</code>, and refund states as durable state transitions. When a late successful payment arrives after the seat was legitimately reassigned, do not steal the seat from the new holder: record compensation/refund work with its own stable idempotency key.</p>
+<p><strong>Pass:</strong> duplicate callbacks do not create duplicate bookings; timeout-after-charge becomes reconciliation work; late success cannot confirm an expired reassigned hold; repeated refund processing does not duplicate the refund effect.</p>
+<h3>20-D. Broadcast committed changes and control a flash sale</h3>
+<p>Publish seat-map changes through the outbox after commit. Include show ID, seat IDs, and versions. On reconnect or detected version gaps, clients fetch an authoritative snapshot. A WebSocket message is a notification of state, not permission to buy a seat.</p>
+<p>Add a waiting room with bounded admission and a documented fairness policy. Rate-limit expensive hold attempts independently of cheap catalog reads. Keep the admitted-work queue bounded and measure rejection/wait time, rather than simply accepting an unlimited backlog.</p>
+<p><strong>Break it:</strong> direct 100 clients at one seat, disconnect live updates, kill one API, and slow the database while admission continues.</p>
+<p><strong>Pass:</strong> at most one current valid hold/booking owns the seat, unavailable responses are distinguished from infrastructure failures, and resource usage remains bounded under the tested spike.</p>
+<h3>20-E. Add cancellation, refunds, and search projections</h3>
+<p>Define cancellation policy for this teaching system. For example, a confirmed booking may transition to cancelled and release its seats in a transaction that also creates refund-pending work. A delayed provider refund does not require pretending the cancellation never happened; expose both states accurately.</p>
+<p>Make cancellation idempotent and check ownership. Publish seat availability only from committed transitions. Index show discovery asynchronously while keeping hold decisions on the authoritative database.</p>
+<p>Assign each show a home writer for the multi-region exercise. Route all competing seat mutations for that show to the same authority unless you deliberately implement and test a stronger distributed coordination design. Separate read availability from write availability.</p>
+<p><strong>Completion gate:</strong> retain evidence for simultaneous holds, multi-seat rollback, expired-hold replacement, stale cleanup, duplicate payment callback, timeout-after-charge, late payment success, duplicate cancellation/refund, live-update gap recovery, and overload admission. No real payment service or money is needed.</p>
+<hr />
+<h1 id="lab-21">21. Capstone - Google Drive and Dropbox</h1>
+<p><strong>Project:</strong> FileHub, tenant-isolated file storage with resumable uploads, versions, sharing, and offline synchronization.</p>
+<p><strong>Source alignment:</strong> capacity, APIs, data model, component design, regions, tradeoffs, failure scenarios, security, and interview review. This is an implementation assignment inspired by the indexed case-study category, not a reproduction of Google or Dropbox's internal design.</p>
+<h3>21-A. Build metadata and immutable content manifests</h3>
+<p>Create <code>files(id, tenant_id, parent_id, name, current_version, deleted_at)</code>, <code>file_versions</code>, <code>chunks</code>, <code>manifest_entries(version_id, ordinal, chunk_id)</code>, upload sessions, access-control entries, and a change feed. Validate folder ownership and prevent parent cycles.</p>
+<p>Start with a streaming whole-file adapter, then split large files into fixed-size chunks for the exercise. Compute SHA-256 for each chunk and record its exact byte count. A manifest stores ordered chunks and the file length; verify reassembled bytes, not just the existence of chunk names.</p>
+<p>Deduplicate within a tenant initially to avoid introducing cross-tenant existence/privacy concerns. Keep logical user quota separate from physically deduplicated storage. Define version retention explicitly.</p>
+<p><strong>Pass:</strong> the reconstructed file matches the original byte-for-byte, a missing/corrupt chunk is detected, and file access remains authorized independently of knowledge of a chunk hash.</p>
+<h3>21-B. Implement resumable uploads and atomic publication</h3>
+<p>Expose create-upload, upload-part, inspect-upload, and complete-upload endpoints. Bind sessions to tenant and owner. Identify each part by session and ordinal; reject a retry that changes the content for an already accepted part unless your API explicitly supports replacement.</p>
+<p>For completion, validate the entire manifest, expected size, and checksums, then publish the new version and update metadata in one database transaction. Bytes uploaded before completion remain staged, not visible as a completed file. Completing the same session twice must return the same published version.</p>
+<p><strong>Break it:</strong> disconnect after several chunks, restart the client, resend a part, kill the API before metadata commit, and complete concurrently from two clients.</p>
+<p><strong>Pass:</strong> upload resumes without restarting valid parts, completion is idempotent, incomplete files are not advertised, and abandoned sessions can be cleaned without deleting referenced chunks.</p>
+<h3>21-C. Synchronize clients using a commit-safe change cursor</h3>
+<p>Implement a change feed scoped to a tenant, with tombstones for deletion and the file version associated with each change. For the teaching implementation, serialize sequence allocation using a tenant counter row locked and incremented in the <strong>same transaction</strong> that mutates metadata and inserts the change record.</p>
+<p>Do not casually use a standalone <code>BIGSERIAL</code> value as a guaranteed commit-order cursor. One transaction can allocate a lower sequence and commit after another transaction whose higher sequence was already consumed. A client that advances past the higher value can then miss the late lower record. The counter-row lock approach deliberately serializes same-tenant commits; document its throughput tradeoff.</p>
+<p>Build a consistent initial snapshot/cursor handoff, followed by paginated incremental changes. Define a response for a cursor older than retained history, such as an explicit full-resynchronization requirement.</p>
+<p><strong>Pass:</strong> delaying one metadata transaction cannot make another client's cursor permanently skip its change. Replaying the same feed page is harmless.</p>
+<h3>21-D. Handle offline edit conflicts without losing data</h3>
+<p>Create two client working directories strictly beneath a dedicated lab path. Keep local metadata mapping file IDs, known versions, and pending operations. Do not point the exercise at your real documents folder.</p>
+<p>Use a base-version condition when uploading an edit. If both clients edit the same file offline, choose an explicit conflict policy: preserve both versions and create a conflict copy, or present a merge workflow. Do not silently overwrite the later server state. Whole-file synchronization is different from the CRDT text editor in Lab 17.</p>
+<p>Test rename versus edit, delete versus edit, move into a deleted parent, and stale client replay. Use stable file IDs so a rename is not necessarily a delete-and-reupload operation.</p>
+<p><strong>Pass:</strong> both conflicting contents remain recoverable, tombstones propagate, and repeated synchronization converges according to your documented policy.</p>
+<h3>21-E. Add sharing, revocation, and safe garbage collection</h3>
+<p>Support owner-controlled ACL changes and narrowly scoped share/download tickets. Authorize metadata, content, and change-feed access consistently. Test revocation with warm caches and previously issued tickets. Explain whether ticket expiry creates a bounded revocation delay or whether each download rechecks current permission.</p>
+<p>Garbage collection must account for retained versions, in-progress uploads, and concurrent publication. Use a documented transactional reference or mark-and-sweep protocol with a grace period and final eligibility check. A count observed earlier is not permission to delete bytes currently being published.</p>
+<p><strong>Break it:</strong> run cleanup while another client completes an upload referencing an existing chunk; retry deletion jobs; restore metadata from backup; and revoke an active shared user.</p>
+<p><strong>Pass:</strong> cleanup never deletes a chunk referenced by a live retained version, permissions are not accidentally restored from stale cache, and restore procedures include the referenced bytes and required keys.</p>
+<h3>21-F. Exercise recovery and region tradeoffs</h3>
+<p>Restore metadata and object data into an isolated environment, then verify manifests, versions, permissions, and incremental-sync behavior. Do not allow restored background jobs to produce real external effects.</p>
+<p>Model a home writer and a delayed remote replica. Document what a client sees when metadata has arrived but chunks have not, or when a regional failure loses recently acknowledged data under the chosen replication policy. Local simulated delays are useful experiments, not a proof of a real provider's regional durability.</p>
+<p><strong>Completion gate:</strong> demonstrate interrupted-upload resume, repeated completion, checksum mismatch, conflict preservation, deletion propagation, safe cursor behavior, cross-tenant denial, share revocation, GC/publication races, and verified restore. Deliver a working two-client demonstration plus the same architecture and evidence package used in earlier capstones.</p>
+<hr />
+<h1>Coverage and Completion Checklist</h1>
+<p>The source supplied is an index only. This mapping establishes coverage of its visible top-level topics and fourteen named roadmap patterns, not the complete unpublished contents of every linked chapter.</p>
+<table>
+<thead>
+<tr>
+<th>Source area</th>
+<th>Implementation coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Files 01-15: core HLD concepts</td>
+<td>Labs 01-15, with baseline changes, failure experiments, and pass criteria</td>
+</tr>
+<tr>
+<td>File 16: Architecture &amp; Frameworks</td>
+<td>Lab 16, newly authored six-artifact review and architecture defense</td>
+</tr>
+<tr>
+<td>File 17: Roadmaps &amp; Study Plans</td>
+<td>Lab 17, all 14 named pattern projects and a new milestone-based schedule</td>
+</tr>
+<tr>
+<td>File 18: URL Shortener</td>
+<td>Lab 18: keys, CRUD, redirects, expiry, caching, analytics, failures</td>
+</tr>
+<tr>
+<td>File 19: Pastebin</td>
+<td>Lab 19: object/metadata states, expiry, Bloom safety, security, growth</td>
+</tr>
+<tr>
+<td>File 20: BookMyShow</td>
+<td>Lab 20: holds, concurrency, simulated payment, cancellation, live updates</td>
+</tr>
+<tr>
+<td>File 21: Drive/Dropbox</td>
+<td>Lab 21: manifests, resumable upload, versions, safe sync cursors, sharing, GC</td>
+</tr>
+<tr>
+<td>Interview-oriented notes, decision frameworks, anti-patterns</td>
+<td>Evidence template, decision records, failure explanations, and Lab 16 review</td>
+</tr>
+<tr>
+<td>Hidden detailed strategies, original 70-problem map, original day-by-day roadmap</td>
+<td>Not available in the uploaded index; not represented as recovered content</td>
+</tr>
+</tbody>
+</table>
+<p>For each experiment, record <strong>not started / built / failure reproduced / assertion passed / tradeoff explained</strong>. An attractive UI is not the completion criterion.</p>
+<p>The fourteen pattern projects are explicitly numbered 17-P01 through 17-P14. Their grouping follows the supplied index, without inventing the unseen original explanations.</p>
+<hr />
+<h1>Implementation References</h1>
+<p>The uploaded index supplies the curriculum organization. These official references support the implementation semantics used in newly authored exercises. Reference pages may evolve; the package does not assert its teaching image versions are the latest. Technical verification was performed during preparation on 6 October 2026.</p>
+<h2>[PG-ISO] PostgreSQL transaction isolation</h2>
+<p><code>https://www.postgresql.org/docs/17/transaction-iso.html</code></p>
+<h2>[PG-LOCK] PostgreSQL explicit locking</h2>
+<p><code>https://www.postgresql.org/docs/current/explicit-locking.html</code></p>
+<h2>[PG-PARTITION] PostgreSQL table partitioning</h2>
+<p><code>https://www.postgresql.org/docs/17/ddl-partitioning.html</code></p>
+<h2>[PG-EXPLAIN] PostgreSQL using EXPLAIN</h2>
+<p><code>https://www.postgresql.org/docs/17/using-explain.html</code></p>
+<h2>[PG-REPLICATION] PostgreSQL warm standby and replication</h2>
+<p><code>https://www.postgresql.org/docs/17/warm-standby.html</code></p>
+<h2>[PG-PITR] PostgreSQL continuous archiving and recovery</h2>
+<p><code>https://www.postgresql.org/docs/17/continuous-archiving.html</code></p>
+<h2>[PG-RLS] PostgreSQL row-level security</h2>
+<p><code>https://www.postgresql.org/docs/17/ddl-rowsecurity.html</code></p>
+<h2>[PG-SEARCH] PostgreSQL text search</h2>
+<p><code>https://www.postgresql.org/docs/17/textsearch-intro.html</code></p>
+<h2>[REDIS-LOCK] Redis distributed-lock patterns and limitations</h2>
+<p><code>https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/</code></p>
+<h2>[REDIS-EVICT] Redis eviction policies</h2>
+<p><code>https://redis.io/docs/latest/develop/reference/eviction/</code></p>
+<h2>[REDIS-LUA] Redis scripting with Lua</h2>
+<p><code>https://redis.io/docs/latest/develop/programmability/eval-intro/</code></p>
+<h2>[RABBIT-CONFIRMS] RabbitMQ publisher confirms and consumer acknowledgements</h2>
+<p><code>https://www.rabbitmq.com/docs/confirms</code></p>
+<h2>[COMPOSE] Docker Compose startup ordering and health dependencies</h2>
+<p><code>https://docs.docker.com/compose/how-tos/startup-order/</code></p>
+<h2>[NGINX] NGINX upstream configuration</h2>
+<p><code>https://nginx.org/en/docs/http/ngx_http_upstream_module.html</code></p>
+<h2>[HTTP] RFC 9110: HTTP Semantics</h2>
+<p><code>https://www.rfc-editor.org/rfc/rfc9110.html</code></p>
+<h2>[K6] k6 open and closed workload models</h2>
+<p><code>https://grafana.com/docs/k6/latest/using-k6/scenarios/concepts/open-vs-closed/</code></p>
+<h2>[S3-MULTIPART] Amazon S3 multipart upload overview</h2>
+<p><code>https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html</code></p>
+<h2>[ETCD-FAILURES] etcd failure behavior</h2>
+<p><code>https://etcd.io/docs/v3.6/op-guide/failures/</code></p>
+<h2>[ETCD-CONTAINER] etcd container deployment</h2>
+<p><code>https://etcd.io/docs/v3.6/op-guide/container/</code></p>
+<h2>[OWASP-BOLA] OWASP API1: Broken Object Level Authorization</h2>
+<p><code>https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/</code></p>
+<h2>[OTEL] OpenTelemetry Node.js getting started</h2>
+<p><code>https://opentelemetry.io/docs/languages/js/getting-started/nodejs/</code></p>
+<h2>[AWS-RETRY] AWS Architecture: exponential backoff and jitter</h2>
+<p><code>https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/</code></p>
+<h2>[GRPC] gRPC Node.js basics</h2>
+<p><code>https://grpc.io/docs/languages/node/basics/</code></p>
+<h2>[GRAPHQL] GraphQL.js N+1 and DataLoader</h2>
+<p><code>https://www.graphql-js.org/docs/n1-dataloader/</code></p>
+<h2>[YJS] Yjs collaborative editor</h2>
+<p><code>https://docs.yjs.dev/getting-started/a-collaborative-editor</code></p>
+<h2>[POSTGIS] PostGIS ST_DWithin</h2>
+<p><code>https://postgis.net/docs/ST_DWithin.html</code></p>
+<h2>[ROBOTS] RFC 9309: Robots Exclusion Protocol</h2>
+<p><code>https://www.rfc-editor.org/rfc/rfc9309.html</code></p>
+<hr />
+<h1>Validation Record</h1>
+<h2>Executed successfully in the authoring environment</h2>
+<ul>
+<li>Node.js v22.16.0: <code>node --test test/*.test.mjs</code> - <strong>36 tests passed, 0 failed</strong>.</li>
+<li><code>node --check</code> on every <code>.mjs</code> file under <code>src/</code>, <code>scripts/</code>, and <code>test/</code> - passed.</li>
+<li>Started the actual memory-demo HTTP server, checked liveness, created a booking, and repeated its idempotency key - same booking ID returned.</li>
+<li>Parsed the main Compose YAML and both optional infrastructure YAML files - syntactically valid YAML with the expected service names. This is not equivalent to Docker Compose runtime validation.</li>
+<li>Checked workbook code-fence balance, named experiment count, reference labels, and package contents.</li>
+</ul>
+<p>The raw unit/HTTP test output is in <code>evidence/author-validation-tests.txt</code>.</p>
+<h2>Not executed here</h2>
+<p>Docker, PostgreSQL, and Redis executables were unavailable. npm registry access did not complete, so dependencies were not installed here and no dependency lockfile was generated. The database/broker adapters, PostgreSQL race tests, optional replica/etcd stacks, Redis Lua script, and k6 workload require local execution and have not been runtime-verified in this environment.</p>
+<p>The passing HTTP tests use the memory adapter. Its single-process behavior is <strong>not</strong> a proof of PostgreSQL isolation, broker delivery, or multi-node correctness. Production authentication, payment processing, storage/sync, advanced pattern services, and cloud deployment are learner-built extensions rather than completed starter features.</p>
+<p>No throughput, latency, recovery-time, or cloud-scale performance figures are claimed as measured results. Numeric targets in the workbook are proposed experiment settings or explicitly labeled arithmetic examples.</p>
+<h2>Suggested local verification order</h2>
+<ol>
+<li>Run the 36 fast tests.</li>
+<li>Build the Compose environment, seed fixtures, and inspect readiness.</li>
+<li>Run <code>node scripts/integration.mjs</code>.</li>
+<li>Run the one-seat race on its unused fixture and check database conservation.</li>
+<li>Enable the asynchronous profile and perform the outbox/consumer crash experiments.</li>
+<li>Execute optional infrastructure recipes and each advanced lab independently.</li>
+</ol>
+<p>Keep any failures and environment changes in <code>evidence/</code>; do not edit a benchmark report to imply a test passed when it was not run.</p>
+</main></div><footer>Local teaching workbook. See the validation record for executed tests and unverified integrations.</footer></body></html>
